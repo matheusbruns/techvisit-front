@@ -1,13 +1,12 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
-import { Login } from './login/Login';
+import AppRoutes from './router/Router';
+import { BrowserRouter } from 'react-router-dom';
+import "./util/styles/global.scss";
 
 function App() {
   return (
-    <div className="App">
-      <Login />
-    </div>
+    <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
   );
 }
 

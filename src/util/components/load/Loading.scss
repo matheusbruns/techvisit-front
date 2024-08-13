@@ -1,0 +1,29 @@
+// Variáveis de estilo
+$spinner-size: 50px;
+$spinner-color: #f97316;
+$spinner-speed: 1s;
+
+.loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh; // Ocupa a tela inteira
+}
+
+.spinner {
+  width: $spinner-size;
+  height: $spinner-size;
+  border: 5px solid $spinner-color;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin $spinner-speed linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

@@ -36,7 +36,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const login = (userData: any) => {
         setUser(userData);
         localStorage.setItem("user", JSON.stringify(userData));
-        navigate("/home");
+        navigate("/techvisit/home");
     };
 
     const logout = () => {

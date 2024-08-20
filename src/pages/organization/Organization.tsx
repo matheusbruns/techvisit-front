@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Box, Container, Breadcrumbs, Typography, Link } from '@mui/material';
 import Header from '../../util/components/header/Header';
-import { DataGrid, GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
+import { GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 import TopButtons from '../../util/components/topButtons/TopButtons';
+import GenericDataGrid from '../../util/components/dataGrid/GenericDataGrid';
+import CompanyModal from './components/CompanyModal';
 
 const columns: GridColDef[] = [
     {
@@ -43,18 +45,20 @@ const rows = [
     { id: 5, externalCode: 'Lannister 4', name: 'empresa', status: false },
     { id: 6, externalCode: 'Lannister 5', name: 'empresa', status: false },
     { id: 7, externalCode: 'Lannister 6', name: 'empresa', status: false },
-    { id: 8, externalCode: 'Lannister 7', name: 'empresa', status: false },
 ];
 
-export default function EmpresaScreen() {
+export default function Organization() {
     const [selectedRows, setSelectedRows] = useState<GridRowSelectionModel>([]);
+    const [rowsPerPage, setRowsPerPage] = React.useState(10);
+    const [page, setPage] = React.useState(0);
+    const [openModal, setOpenModal] = useState(false);
 
     const handleSelectionChange = (newSelection: GridRowSelectionModel) => {
         setSelectedRows(newSelection);
     };
 
     const handleAddClick = () => {
-        console.log('Nova Empresa clicada');
+        setOpenModal(true);
     };
 
     const handleEditClick = () => {
@@ -63,10 +67,19 @@ export default function EmpresaScreen() {
         }
     };
 
+    const handleCloseModal = () => {
+        setOpenModal(false);
+    };
+
     const handleDeleteClick = () => {
         if (selectedRows.length > 0) {
             console.log('Excluir empresas com IDs:', selectedRows);
         }
+    };
+
+    const handleChangeRowsPerPage = (event: any) => {
+        setRowsPerPage(+event.target.value);
+        setPage(0);
     };
 
     return (
@@ -97,43 +110,17 @@ export default function EmpresaScreen() {
                         isDeleteDisabled={selectedRows.length === 0}
                     />
 
-                    <Box sx={{ width: '100%' }}>
-                        <DataGrid
-                            sx={{
-                                boxShadow: 1,
-                                border: 1,
-                                borderColor: '#3A3A3A',
-                                '& .MuiDataGrid-cell:hover': {
-                                    color: '#3A3A3A',
-                                },
-                                '& .css-12wnr2w-MuiButtonBase-root-MuiCheckbox-root.Mui-checked': {
-                                    color: '#ff6a00',
-                                },
-                                '& .MuiDataGrid-row:nth-of-type(even)': {
-                                    backgroundColor: '#f5f5f5',
-                                },
-                                '& .MuiDataGrid-row:nth-of-type(odd)': {
-                                    backgroundColor: '#ffffff',
-                                },
-                                '& .Mui-selected': {
-                                    backgroundColor: '#ffe0b2 !important',
-                                },
-                            }}
-                            rows={rows}
-                            columns={columns}
-                            initialState={{
-                                pagination: {
-                                    paginationModel: {
-                                        pageSize: 10,
-                                    },
-                                },
-                            }}
-                            pageSizeOptions={[5]}
-                            checkboxSelection
-                            disableRowSelectionOnClick
-                            onRowSelectionModelChange={handleSelectionChange}
-                        />
-                    </Box>
+                    <GenericDataGrid
+                        rows={rows}
+                        columns={columns}
+                        selectedRows={selectedRows}
+                        onRowSelectionChange={handleSelectionChange}
+                        pageSizeOptions={[5, 10, 20, 50]}
+                        rowsPerPage={rowsPerPage}
+                        onRowsPerPageChange={handleChangeRowsPerPage}
+                    />
+
+                    <CompanyModal open={openModal} handleClose={handleCloseModal} />
 
                 </Container>
             </Box>

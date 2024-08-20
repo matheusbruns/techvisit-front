@@ -21,9 +21,11 @@ export default function Header() {
 				<div className="header-top">
 					<div className="header-top-container">
 						<IconButton onClick={toggleDrawer(true)} className="menu-icon">
-							<MenuOutlined />
+							<MenuOutlined sx={{
+								fontSize: 38
+							}} />
 						</IconButton>
-						<img src={Logo} alt="TECHVISIT" height={40} className="logo" />
+						<img src={Logo} alt="TECHVISIT" height={60} className="logo" />
 					</div>
 				</div>
 			</div>

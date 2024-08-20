@@ -23,9 +23,14 @@ export default function TopButtons({
         <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: 2 }}>
             <Button
                 variant="contained"
-                color="primary"
+                sx={{
+                    backgroundColor: '#f97316',
+                    color: '#ffffff',
+                    '&:hover': {
+                        backgroundColor: '#e56b0a',
+                    },
+                }}
                 startIcon={<Add />}
-                sx={{ backgroundColor: '#f97316' }}
                 onClick={onAddClick}
             >
                 {buttonLabel}

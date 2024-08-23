@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box } from '@mui/material';
-import { DataGrid, GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
+import { DataGrid } from '@mui/x-data-grid';
 import CustomToolbar from './customToolbar/CustomToolBar';
 import { GenericDataGridProps } from './IGenericDataGrid';
 
@@ -27,13 +27,12 @@ const GenericDataGrid: React.FC<GenericDataGridProps> = ({
     onRowSelectionChange,
     pageSizeOptions,
     rowsPerPage,
-    onRowsPerPageChange,
 }) => {
     return (
         <Box sx={{ width: '100%' }}>
             <DataGrid
                 sx={{
-                    boxShadow: 1,
+                    boxShadow: 2,
                     border: 1,
                     borderColor: '#3A3A3A',
                     '& .MuiDataGrid-cell:hover': {

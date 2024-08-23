@@ -7,5 +7,4 @@ export interface GenericDataGridProps {
     onRowSelectionChange: (newSelection: GridRowSelectionModel) => void;
     pageSizeOptions: number[];
     rowsPerPage: number;
-    onRowsPerPageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }

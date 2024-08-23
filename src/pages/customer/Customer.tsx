@@ -4,22 +4,9 @@ import Header from '../../util/components/header/Header';
 import { GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 import TopButtons from '../../util/components/topButtons/TopButtons';
 import GenericDataGrid from '../../util/components/dataGrid/GenericDataGrid';
-import CompanyModal from './components/CompanyModal';
+import CustomerModal from './components/CustomerModal';
 
 const columns: GridColDef[] = [
-    {
-        field: 'id',
-        headerName: 'ID',
-        width: 90,
-        disableColumnMenu: true
-    },
-    {
-        field: 'externalCode',
-        headerName: 'Código Externo',
-        width: 250,
-        editable: false,
-        disableColumnMenu: true
-    },
     {
         field: 'name',
         headerName: 'Nome',
@@ -28,23 +15,37 @@ const columns: GridColDef[] = [
         disableColumnMenu: true
     },
     {
-        field: 'status',
-        headerName: 'Status',
-        type: 'boolean',
-        width: 210,
+        field: 'cpf',
+        headerName: 'cpf',
+        width: 250,
         editable: false,
         disableColumnMenu: true
     },
+    {
+        field: 'email',
+        headerName: 'email',
+        width: 250,
+        editable: false,
+        disableColumnMenu: true
+    },
+    {
+        field: 'phoneNumber',
+        headerName: 'Telefone',
+        width: 250,
+        editable: false,
+        disableColumnMenu: true
+    },
+
 ];
 
 const rows = [
-    { id: 1, externalCode: 'Snow', name: 'empresa', status: false },
-    { id: 2, externalCode: 'Lannister 1', name: 'empresa', status: false },
-    { id: 3, externalCode: 'Lannister 2', name: 'empresa', status: false },
-    { id: 4, externalCode: 'Lannister 3', name: 'empresa', status: false },
-    { id: 5, externalCode: 'Lannister 4', name: 'empresa', status: false },
-    { id: 6, externalCode: 'Lannister 5', name: 'empresa', status: false },
-    { id: 7, externalCode: 'Lannister 6', name: 'empresa', status: false },
+    { id: 1, name: "Jose Antonio", cpf: "123.123.123-12", email: "joseantoniodasilva@gmail.com", phoneNumber: "(47) 99231-1243" },
+    { id: 2, name: "Maria Fernanda", cpf: "987.654.321-09", email: "mariafernanda.santos@hotmail.com", phoneNumber: "(11) 98567-4321" },
+    { id: 3, name: "Carlos Eduardo", cpf: "456.789.123-00", email: "carloseduardo1995@yahoo.com", phoneNumber: "(21) 98765-6789" },
+    { id: 4, name: "Ana Paula", cpf: "321.654.987-77", email: "anapaula@gmail.com", phoneNumber: "(19) 98123-4567" },
+    { id: 5, name: "Roberto Silva", cpf: "654.321.987-55", email: "roberto.silva@outlook.com", phoneNumber: "(31) 99876-5432" },
+    { id: 6, name: "Luciana Oliveira", cpf: "789.123.456-66", email: "luciana.oliveira@hotmail.com", phoneNumber: "(41) 99321-8765" },
+    { id: 7, name: "Felipe Costa", cpf: "123.456.789-33", email: "felipecosta@gmail.com", phoneNumber: "(51) 91234-5678" },
 ];
 
 export default function Organization() {
@@ -63,7 +64,7 @@ export default function Organization() {
 
     const handleEditClick = () => {
         if (selectedRows.length === 1) {
-            console.log('Editar empresa com ID:', selectedRows[0]);
+            console.log('Editar cliente com ID:', selectedRows[0]);
         }
     };
 
@@ -73,7 +74,7 @@ export default function Organization() {
 
     const handleDeleteClick = () => {
         if (selectedRows.length > 0) {
-            console.log('Excluir empresas com IDs:', selectedRows);
+            console.log('Excluir clientes com IDs:', selectedRows);
         }
     };
 
@@ -91,18 +92,15 @@ export default function Organization() {
                         <Link underline="hover" color="inherit" href="/">
                             Início
                         </Link>
-                        <Link underline="hover" color="inherit" href="/">
-                            Administrador
-                        </Link>
-                        <Typography color="text.primary">Empresa</Typography>
+                        <Typography color="text.primary">Clientes</Typography>
                     </Breadcrumbs>
 
                     <Typography variant="h4" component="h1" gutterBottom>
-                        Empresas
+                        Clientes
                     </Typography>
 
                     <TopButtons
-                        buttonLabel="Nova Empresa"
+                        buttonLabel="Novo Cliente"
                         onAddClick={handleAddClick}
                         onEditClick={handleEditClick}
                         onDeleteClick={handleDeleteClick}
@@ -117,10 +115,9 @@ export default function Organization() {
                         onRowSelectionChange={handleSelectionChange}
                         pageSizeOptions={[5, 10, 20, 50]}
                         rowsPerPage={rowsPerPage}
-                        onRowsPerPageChange={handleChangeRowsPerPage}
                     />
 
-                    <CompanyModal open={openModal} handleClose={handleCloseModal} />
+                    <CustomerModal open={openModal} handleClose={handleCloseModal} />
 
                 </Container>
             </Box>

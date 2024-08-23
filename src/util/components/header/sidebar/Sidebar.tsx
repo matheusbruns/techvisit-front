@@ -10,7 +10,7 @@ interface SidebarProps {
 
 const menuItems = [
     { text: 'Início', path: '/techvisit/home', icon: <Home /> },
-    { text: 'Empresa', path: '/techvisit/administrator/organization', icon: <Language /> },
+    { text: 'Clientes', path: '/techvisit/customer', icon: <Language /> },
     { text: 'Contact', path: '/contact', icon: <ContactMail /> },
 ];
 

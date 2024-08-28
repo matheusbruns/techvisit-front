@@ -1,84 +1,288 @@
 import React, { useState } from 'react';
-import { Modal, Box, TextField, Button, Typography, FormControlLabel, Checkbox } from '@mui/material';
+import { Modal, Box, TextField, Button, Typography, Grid } from '@mui/material';
 
-interface CompanyModalProps {
+interface CustomerModalProps {
     open: boolean;
     handleClose: () => void;
 }
 
-const CompanyModal: React.FC<CompanyModalProps> = ({ open, handleClose }) => {
-    const [companyData, setCompanyData] = useState({
-        name: '',
-        externalCode: '',
-        status: false,
+const formatCPF = (value: string) => {
+    const cleaned = value.replace(/\D/g, '');
+    const match = cleaned.match(/^(\d{3})(\d{3})?(\d{3})?(\d{2})?$/);
+    if (match) {
+        return `${match[1]}${match[2] ? '.' + match[2] : ''}${match[3] ? '.' + match[3] : ''}${match[4] ? '-' + match[4] : ''}`;
+    }
+    return value;
+};
+
+const formatPhoneNumber = (value: string) => {
+    const cleaned = value.replace(/\D/g, '');
+    const match = cleaned.match(/^(\d{2})(\d{5})?(\d{4})?$/);
+    if (match) {
+        return `(${match[1]}) ${match[2] ? match[2] : ''}${match[3] ? '-' + match[3] : ''}`;
+    }
+    return value;
+};
+
+const formatCEP = (value: string) => {
+    const cleaned = value.replace(/\D/g, '');
+    const match = cleaned.match(/^(\d{5})(\d{3})?$/);
+    if (match) {
+        return `${match[1]}-${match[2] ? match[2] : ''}`;
+    }
+    return value;
+};
+
+const CustomerModal: React.FC<CustomerModalProps> = ({ open, handleClose }) => {
+    const [customerData, setCustomerData] = useState({
+        firstName: '',
+        lastName: '',
+        cpf: '',
+        phoneNumber: '',
+        street: '',
+        number: '',
+        complement: '',
+        cep: '',
+    });
+
+    const [errors, setErrors] = useState({
+        firstName: false,
+        lastName: false,
+        cpf: false,
+        phoneNumber: false,
+        street: false,
+        number: false,
+        complement: false,
+        cep: false,
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value, type, checked } = e.target;
-        setCompanyData({
-            ...companyData,
-            [name]: type === 'checkbox' ? checked : value,
-        });
+        const { name, value } = e.target;
+        if (name === 'cpf') {
+            setCustomerData({
+                ...customerData,
+                [name]: formatCPF(value),
+            });
+        } else if (name === 'phoneNumber') {
+            setCustomerData({
+                ...customerData,
+                [name]: formatPhoneNumber(value),
+            });
+        } else if (name === 'cep') {
+            setCustomerData({
+                ...customerData,
+                [name]: formatCEP(value),
+            });
+        } else {
+            setCustomerData({
+                ...customerData,
+                [name]: value,
+            });
+        }
+    };
+
+    const validateForm = () => {
+        const newErrors = {
+            firstName: !customerData.firstName,
+            lastName: !customerData.lastName,
+            cpf: !customerData.cpf || !/^(\d{3}\.\d{3}\.\d{3}-\d{2})$/.test(customerData.cpf),
+            phoneNumber: !customerData.phoneNumber || !/^\(\d{2}\) \d{5}-\d{4}$/.test(customerData.phoneNumber),
+            street: !customerData.street,
+            number: !customerData.number,
+            complement: false,
+            cep: !customerData.cep || !/^\d{5}-\d{3}$/.test(customerData.cep),
+        };
+
+        setErrors(newErrors);
+        return Object.values(newErrors).every(x => !x);
     };
 
     const handleSubmit = () => {
-        // Lógica para enviar dados do formulário
-        console.log('Dados enviados:', companyData);
-        handleClose(); // Fecha a modal após o envio
+        if (validateForm()) {
+            console.log('Dados do cliente enviados:', customerData);
+            setCustomerData({
+                firstName: '',
+                lastName: '',
+                cpf: '',
+                phoneNumber: '',
+                street: '',
+                number: '',
+                complement: '',
+                cep: '',
+            });
+            handleClose();
+        }
+    };
+
+    const handleCancel = () => {
+        setCustomerData({
+            firstName: '',
+            lastName: '',
+            cpf: '',
+            phoneNumber: '',
+            street: '',
+            number: '',
+            complement: '',
+            cep: '',
+        });
+        handleClose();
     };
 
     return (
         <Modal open={open} onClose={handleClose}>
-            <Box sx={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                width: 400,
-                bgcolor: 'background.paper',
-                boxShadow: 24,
-                p: 4,
-            }}>
+            <Box
+                component="form"
+                autoComplete="off"
+                sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: 600,
+                    bgcolor: 'background.paper',
+                    boxShadow: 24,
+                    p: 4,
+                    borderRadius: 2,
+                }}
+            >
                 <Typography variant="h6" component="h2" gutterBottom>
-                    Cadastrar Nova Empresa
+                    Cadastrar Novo Cliente
                 </Typography>
-                <TextField
-                    fullWidth
-                    margin="normal"
-                    label="Nome"
-                    name="name"
-                    value={companyData.name}
-                    onChange={handleChange}
-                />
-                <TextField
-                    fullWidth
-                    margin="normal"
-                    label="Código Externo"
-                    name="externalCode"
-                    value={companyData.externalCode}
-                    onChange={handleChange}
-                />
-                <FormControlLabel
-                    control={
-                        <Checkbox
-                            name="status"
-                            checked={companyData.status}
+                <Grid container spacing={2}>
+                    <Grid item xs={6}>
+                        <TextField
+                            fullWidth
+                            margin="normal"
+                            label="Nome"
+                            name="firstName"
+                            value={customerData.firstName}
                             onChange={handleChange}
+                            required
+                            error={errors.firstName}
+                            helperText={errors.firstName ? 'Campo obrigatório' : ''}
+                            autoComplete="off"
                         />
-                    }
-                    label="Status"
-                />
-                <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleSubmit}
-                    sx={{ mt: 2 }}
-                >
-                    Salvar
-                </Button>
+                    </Grid>
+                    <Grid item xs={6}>
+                        <TextField
+                            fullWidth
+                            margin="normal"
+                            label="Sobrenome"
+                            name="lastName"
+                            value={customerData.lastName}
+                            onChange={handleChange}
+                            required
+                            error={errors.lastName}
+                            helperText={errors.lastName ? 'Campo obrigatório' : ''}
+                            autoComplete="off"
+                        />
+                    </Grid>
+                    <Grid item xs={6}>
+                        <TextField
+                            fullWidth
+                            margin="normal"
+                            label="CPF"
+                            name="cpf"
+                            value={customerData.cpf}
+                            onChange={handleChange}
+                            required
+                            error={errors.cpf}
+                            helperText={errors.cpf ? 'CPF inválido' : ''}
+                            autoComplete="off"
+                        />
+                    </Grid>
+                    <Grid item xs={6}>
+                        <TextField
+                            fullWidth
+                            margin="normal"
+                            label="Número de Telefone"
+                            name="phoneNumber"
+                            value={customerData.phoneNumber}
+                            onChange={handleChange}
+                            required
+                            error={errors.phoneNumber}
+                            helperText={errors.phoneNumber ? 'Número de telefone inválido' : ''}
+                            autoComplete="off"
+                        />
+                    </Grid>
+                    <Grid item xs={6}>
+                        <TextField
+                            fullWidth
+                            margin="normal"
+                            label="Rua"
+                            name="street"
+                            value={customerData.street}
+                            onChange={handleChange}
+                            required
+                            error={errors.street}
+                            helperText={errors.street ? 'Campo obrigatório' : ''}
+                            autoComplete="off"
+                        />
+                    </Grid>
+                    <Grid item xs={6}>
+                        <TextField
+                            fullWidth
+                            margin="normal"
+                            label="Número"
+                            name="number"
+                            value={customerData.number}
+                            onChange={handleChange}
+                            required
+                            error={errors.number}
+                            helperText={errors.number ? 'Campo obrigatório' : ''}
+                            autoComplete="off"
+                        />
+                    </Grid>
+                    <Grid item xs={6}>
+                        <TextField
+                            fullWidth
+                            margin="normal"
+                            label="Complemento"
+                            name="complement"
+                            value={customerData.complement}
+                            onChange={handleChange}
+                            autoComplete="off"
+                        />
+                    </Grid>
+                    <Grid item xs={6}>
+                        <TextField
+                            fullWidth
+                            margin="normal"
+                            label="CEP"
+                            name="cep"
+                            value={customerData.cep}
+                            onChange={handleChange}
+                            required
+                            error={errors.cep}
+                            helperText={errors.cep ? 'CEP inválido' : ''}
+                            autoComplete="off"
+                        />
+                    </Grid>
+                </Grid>
+                <Box mt={3} display="flex" justifyContent="flex-end">
+                    <Button
+                        variant="text"
+                        color="primary"
+                        onClick={handleCancel}
+                        sx={{ mr: 2 }}
+                    >
+                        Cancelar
+                    </Button>
+                    <Button variant="contained" onClick={handleSubmit}
+                        sx={{
+                            backgroundColor: '#f97316',
+                            color: '#ffffff',
+                            '&:hover': {
+                                backgroundColor: '#e56b0a',
+                            },
+                        }}
+                    >
+                        Salvar
+                    </Button>
+                </Box>
             </Box>
         </Modal>
     );
 };
 
-export default CompanyModal;
+export default CustomerModal;

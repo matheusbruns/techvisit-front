@@ -26,7 +26,7 @@ const Sidebar: React.FC<SidebarProps> = ({ drawerVisible, toggleDrawer }) => {
         <Box
             sx={{
                 width: 250,
-                backgroundColor: '#9c4215',
+                backgroundColor: '#c55117',
                 height: '100%',
                 color: 'white',
                 padding: 2,

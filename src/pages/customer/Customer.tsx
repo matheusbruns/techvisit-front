@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Container, Breadcrumbs, Typography, Link } from '@mui/material';
+import { Box, Container, Typography } from '@mui/material';
 import Header from '../../util/components/header/Header';
 import { GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 import TopButtons from '../../util/components/topButtons/TopButtons';
@@ -46,12 +46,15 @@ const rows = [
     { id: 5, name: "Roberto Silva", cpf: "654.321.987-55", email: "roberto.silva@outlook.com", phoneNumber: "(31) 99876-5432" },
     { id: 6, name: "Luciana Oliveira", cpf: "789.123.456-66", email: "luciana.oliveira@hotmail.com", phoneNumber: "(41) 99321-8765" },
     { id: 7, name: "Felipe Costa", cpf: "123.456.789-33", email: "felipecosta@gmail.com", phoneNumber: "(51) 91234-5678" },
+    { id: 8, name: "Felipe Costa", cpf: "123.456.789-33", email: "felipecosta@gmail.com", phoneNumber: "(51) 91234-5678" },
+    { id: 9, name: "Felipe Costa", cpf: "123.456.789-33", email: "felipecosta@gmail.com", phoneNumber: "(51) 91234-5678" },
+    { id: 10, name: "Felipe Costa", cpf: "123.456.789-33", email: "felipecosta@gmail.com", phoneNumber: "(51) 91234-5678" },
+    { id: 11, name: "Felipe Costa", cpf: "123.456.789-33", email: "felipecosta@gmail.com", phoneNumber: "(51) 91234-5678" },
+    { id: 12, name: "Felipe Costa", cpf: "123.456.789-33", email: "felipecosta@gmail.com", phoneNumber: "(51) 91234-5678" },
 ];
 
 export default function Organization() {
     const [selectedRows, setSelectedRows] = useState<GridRowSelectionModel>([]);
-    const [rowsPerPage, setRowsPerPage] = React.useState(10);
-    const [page, setPage] = React.useState(0);
     const [openModal, setOpenModal] = useState(false);
 
     const handleSelectionChange = (newSelection: GridRowSelectionModel) => {
@@ -78,24 +81,14 @@ export default function Organization() {
         }
     };
 
-    const handleChangeRowsPerPage = (event: any) => {
-        setRowsPerPage(+event.target.value);
-        setPage(0);
-    };
-
     return (
         <>
             <Header />
-            <Box>
-                <Container >
-                    <Breadcrumbs aria-label="breadcrumb" sx={{ marginY: 5 }}>
-                        <Link underline="hover" color="inherit" href="/">
-                            Início
-                        </Link>
-                        <Typography color="text.primary">Clientes</Typography>
-                    </Breadcrumbs>
-
-                    <Typography variant="h4" component="h1" gutterBottom>
+            <Box sx={{ width: '100%', marginTop: 5 }}>
+                <Container
+                    maxWidth={false}
+                >
+                    <Typography variant="h4" component="h1" gutterBottom style={{ marginTop: 25 }}>
                         Clientes
                     </Typography>
 
@@ -111,10 +104,8 @@ export default function Organization() {
                     <GenericDataGrid
                         rows={rows}
                         columns={columns}
-                        selectedRows={selectedRows}
                         onRowSelectionChange={handleSelectionChange}
-                        pageSizeOptions={[5, 10, 20, 50]}
-                        rowsPerPage={rowsPerPage}
+                        pageSizeOptions={[10]}
                     />
 
                     <CustomerModal open={openModal} handleClose={handleCloseModal} />

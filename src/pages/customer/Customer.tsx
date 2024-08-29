@@ -1,61 +1,87 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Container, Typography } from '@mui/material';
 import Header from '../../util/components/header/Header';
 import { GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 import TopButtons from '../../util/components/topButtons/TopButtons';
 import GenericDataGrid from '../../util/components/dataGrid/GenericDataGrid';
 import CustomerModal from './components/CustomerModal';
+import ApiService from '../../conection/api';
 
-const columns: GridColDef[] = [
-    {
-        field: 'name',
-        headerName: 'Nome',
-        width: 250,
-        editable: false,
-        disableColumnMenu: true
-    },
-    {
-        field: 'cpf',
-        headerName: 'cpf',
-        width: 250,
-        editable: false,
-        disableColumnMenu: true
-    },
-    {
-        field: 'email',
-        headerName: 'email',
-        width: 250,
-        editable: false,
-        disableColumnMenu: true
-    },
-    {
-        field: 'phoneNumber',
-        headerName: 'Telefone',
-        width: 250,
-        editable: false,
-        disableColumnMenu: true
-    },
-
-];
-
-const rows = [
-    { id: 1, name: "Jose Antonio", cpf: "123.123.123-12", email: "joseantoniodasilva@gmail.com", phoneNumber: "(47) 99231-1243" },
-    { id: 2, name: "Maria Fernanda", cpf: "987.654.321-09", email: "mariafernanda.santos@hotmail.com", phoneNumber: "(11) 98567-4321" },
-    { id: 3, name: "Carlos Eduardo", cpf: "456.789.123-00", email: "carloseduardo1995@yahoo.com", phoneNumber: "(21) 98765-6789" },
-    { id: 4, name: "Ana Paula", cpf: "321.654.987-77", email: "anapaula@gmail.com", phoneNumber: "(19) 98123-4567" },
-    { id: 5, name: "Roberto Silva", cpf: "654.321.987-55", email: "roberto.silva@outlook.com", phoneNumber: "(31) 99876-5432" },
-    { id: 6, name: "Luciana Oliveira", cpf: "789.123.456-66", email: "luciana.oliveira@hotmail.com", phoneNumber: "(41) 99321-8765" },
-    { id: 7, name: "Felipe Costa", cpf: "123.456.789-33", email: "felipecosta@gmail.com", phoneNumber: "(51) 91234-5678" },
-    { id: 8, name: "Felipe Costa", cpf: "123.456.789-33", email: "felipecosta@gmail.com", phoneNumber: "(51) 91234-5678" },
-    { id: 9, name: "Felipe Costa", cpf: "123.456.789-33", email: "felipecosta@gmail.com", phoneNumber: "(51) 91234-5678" },
-    { id: 10, name: "Felipe Costa", cpf: "123.456.789-33", email: "felipecosta@gmail.com", phoneNumber: "(51) 91234-5678" },
-    { id: 11, name: "Felipe Costa", cpf: "123.456.789-33", email: "felipecosta@gmail.com", phoneNumber: "(51) 91234-5678" },
-    { id: 12, name: "Felipe Costa", cpf: "123.456.789-33", email: "felipecosta@gmail.com", phoneNumber: "(51) 91234-5678" },
-];
-
-export default function Organization() {
+const Organization = () => {
     const [selectedRows, setSelectedRows] = useState<GridRowSelectionModel>([]);
     const [openModal, setOpenModal] = useState(false);
+    const [rows, setRows] = useState<any[]>([]);
+
+    useEffect(() => {
+        // Fetch data from the API when the component mounts
+        const fetchData = async () => {
+            try {
+                const response = await ApiService.get('/customer');
+                const customers = response.data.map((customer: any) => ({
+                    id: customer.id,
+                    name: `${customer.firstName} ${customer.lastName}`,
+                    cpf: customer.cpf,
+                    phoneNumber: customer.phoneNumber,
+                    street: customer.street,
+                    number: customer.number,
+                    complement: customer.complement,
+                    cep: customer.cep,
+                    organizationName: customer.organization.name,
+                }));
+                setRows(customers);
+            } catch (error) {
+                console.error('Erro ao buscar dados', error);
+            }
+        };
+
+        fetchData();
+    }, []); // Empty dependency array means this useEffect runs once on mount
+
+    const columns: GridColDef[] = [
+        {
+            field: 'name',
+            headerName: 'Nome',
+            width: 250,
+            editable: false,
+            disableColumnMenu: true
+        },
+        {
+            field: 'cpf',
+            headerName: 'CPF',
+            width: 150,
+            editable: false,
+            disableColumnMenu: true
+        },
+        {
+            field: 'phoneNumber',
+            headerName: 'Telefone',
+            width: 200,
+            editable: false,
+            disableColumnMenu: true
+        },
+        {
+            field: 'street',
+            headerName: 'Endereço',
+            width: 200,
+            editable: false,
+            disableColumnMenu: true,
+            valueGetter: (params) => `${params.row.street}, ${params.row.number} ${params.row.complement || ''}`
+        },
+        {
+            field: 'cep',
+            headerName: 'CEP',
+            width: 100,
+            editable: false,
+            disableColumnMenu: true
+        },
+        {
+            field: 'organizationName',
+            headerName: 'Organização',
+            width: 200,
+            editable: false,
+            disableColumnMenu: true
+        },
+    ];
 
     const handleSelectionChange = (newSelection: GridRowSelectionModel) => {
         setSelectedRows(newSelection);
@@ -85,9 +111,7 @@ export default function Organization() {
         <>
             <Header />
             <Box sx={{ width: '100%', marginTop: 5 }}>
-                <Container
-                    maxWidth={false}
-                >
+                <Container maxWidth={false}>
                     <Typography variant="h4" component="h1" gutterBottom style={{ marginTop: 25 }}>
                         Clientes
                     </Typography>
@@ -109,9 +133,10 @@ export default function Organization() {
                     />
 
                     <CustomerModal open={openModal} handleClose={handleCloseModal} />
-
                 </Container>
             </Box>
         </>
     );
 }
+
+export default Organization;

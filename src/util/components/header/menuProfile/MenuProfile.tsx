@@ -15,7 +15,7 @@ import { useAuth } from '../../../../contexts/AuthContext';
 export default function MenuProfile() {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
-    const [username, setUsername] = React.useState("Matheus Bruns");
+    const [username, setUsername] = React.useState("Matheus bruns");
     const { logout } = useAuth();
 
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -34,13 +34,29 @@ export default function MenuProfile() {
     return (
         <>
             <Box sx={{
-                display: 'flex', alignItems: 'center', textAlign: 'center',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                textAlign: 'center',
                 cursor: 'pointer',
                 padding: '13px',
                 backgroundColor: '#dbdbdb',
-            }} onClick={handleClick} >
+                width: 200
+            }} onClick={handleClick}>
                 <Avatar sx={{ width: 32, height: 32 }} />
-                <Typography sx={{ paddingLeft: 2, paddingRight: 2, color: '#f97316' }}>{username}</Typography>
+                <Typography
+                    sx={{
+                        paddingLeft: 2,
+                        paddingRight: 2,
+                        color: '#f97316',
+                        maxWidth: 120,
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                    }}
+                >
+                    {username}
+                </Typography>
                 {open ? (
                     <ExpandLessIcon sx={{ color: '#bdbdbd' }} />
                 ) : (

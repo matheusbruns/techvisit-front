@@ -10,6 +10,7 @@ function App() {
 			<AppRoutes />
 			<ToastContainer
 				position='top-right'
+				style={{ marginTop: 50 }}
 				autoClose={3000}
 				hideProgressBar={false}
 				newestOnTop={false}

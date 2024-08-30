@@ -1,6 +1,9 @@
-// ApiService.ts
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 import { toast } from 'react-toastify';
+
+export interface ErrorResponse {
+    message: string;
+}
 
 class ApiService {
     private static instance: ApiService;
@@ -8,7 +11,7 @@ class ApiService {
 
     private constructor() {
         this.axiosInstance = axios.create({
-            baseURL: process.env.REACT_APP_API_BASE_URL || 'https://sua-api.com',
+            baseURL: process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080',
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -31,14 +34,20 @@ class ApiService {
         );
     }
 
-    private handleResponse(response: AxiosResponse) {
+    private handleResponse<T>(response: AxiosResponse<T>): AxiosResponse<T> {
         return response;
     }
 
-    private handleError(error: AxiosError) {
+    private handleError(error: AxiosError<ErrorResponse>) {
         if (error.response) {
-            const message = (error.response.data as { message?: string })?.message || 'Ocorreu um erro no servidor';
-            toast.error(message);
+            const status = error.response.status;
+            const message = error.response.data.message || 'Ocorreu um erro no servidor';
+
+            if (status === 403) {
+                toast.error('Acesso negado: você não tem permissão para esta ação.');
+            } else {
+                toast.error(message);
+            }
         } else if (error.request) {
             toast.error('Sem resposta do servidor. Verifique sua conexão.');
         } else {
@@ -47,20 +56,24 @@ class ApiService {
         return Promise.reject(error);
     }
 
-    public get<T>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-        return this.axiosInstance.get<T>(url, config);
+    public async get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
+        const response = await this.axiosInstance.get<T>(url, config);
+        return response.data;
     }
 
-    public post<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-        return this.axiosInstance.post<T>(url, data, config);
+    public async post<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+        const response = await this.axiosInstance.post<T>(url, data, config);
+        return response.data;
     }
 
-    public put<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-        return this.axiosInstance.put<T>(url, data, config);
+    public async put<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+        const response = await this.axiosInstance.put<T>(url, data, config);
+        return response.data;
     }
 
-    public delete<T>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-        return this.axiosInstance.delete<T>(url, config);
+    public async delete<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
+        const response = await this.axiosInstance.delete<T>(url, config);
+        return response.data;
     }
 
     public setAuthorizationHeader(token: string | null) {

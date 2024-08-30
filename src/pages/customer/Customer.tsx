@@ -13,10 +13,9 @@ const Organization = () => {
     const [rows, setRows] = useState<any[]>([]);
 
     useEffect(() => {
-        // Fetch data from the API when the component mounts
         const fetchData = async () => {
             try {
-                const response = await ApiService.get('/customer');
+                const response: any = await ApiService.get('/customer?organization=1');
                 const customers = response.data.map((customer: any) => ({
                     id: customer.id,
                     name: `${customer.firstName} ${customer.lastName}`,
@@ -35,7 +34,7 @@ const Organization = () => {
         };
 
         fetchData();
-    }, []); // Empty dependency array means this useEffect runs once on mount
+    }, []);
 
     const columns: GridColDef[] = [
         {
@@ -65,7 +64,7 @@ const Organization = () => {
             width: 200,
             editable: false,
             disableColumnMenu: true,
-            valueGetter: (params) => `${params.row.street}, ${params.row.number} ${params.row.complement || ''}`
+            valueGetter: (params: any) => `${params.row.street}, ${params.row.number} ${params.row.complement || ''}`
         },
         {
             field: 'cep',

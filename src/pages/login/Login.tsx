@@ -3,9 +3,11 @@ import Logo from '../../resources/images/logo.png';
 import illustration from '../../resources/images/login-illustration.png';
 import './Login.scss';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { TextField, Button, Checkbox, FormControlLabel, CircularProgress, Typography, Box, Container, Grid, createTheme, ThemeProvider } from '@mui/material';
-import { deepOrange } from '@mui/material/colors';
+import { useAuth } from '../../contexts/AuthContext';
+import ApiService from '../../conection/api';
+import { LoginResponse } from './ILogin';
+import { toast } from 'react-toastify';
 
 const theme = createTheme({
     components: {
@@ -44,33 +46,25 @@ export function Login() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const navigate = useNavigate();
+    const { authlogin } = useAuth();
 
     const handleLogin = async (event: React.FormEvent) => {
         event.preventDefault();
         setIsLoading(true);
 
         try {
-            const response = await axios.post('/login', { username, password });
-
-            localStorage.setItem('user', JSON.stringify(response.data.user));
-
-            navigate('/techvisit/home');
+            const login = username;
+            const response: LoginResponse = await ApiService.post('/auth/login', { login, password });
+            const token: any = response.token;
+            ApiService.setAuthorizationHeader(token);
+            authlogin(response.user, token);
         } catch (error) {
-
-            localStorage.setItem('user', JSON.stringify("aaaaaaaaaaaaaa"));
-
-            window.location.reload()
-
-            // if (axios.isAxiosError(error) && error.response) {
-            //     alert(error.response.data.message || 'Erro ao tentar fazer login. Tente novamente.');
-            // } else {
-            //     alert('Erro ao tentar fazer login. Tente novamente.');
-            // }
+            toast.error("Usuário ou senha invalidos!")
         } finally {
             setIsLoading(false);
         }
     };
+
 
     return (
         <Grid container className="login-page">

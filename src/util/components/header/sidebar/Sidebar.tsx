@@ -10,7 +10,7 @@ interface SidebarProps {
 
 const menuItems = [
     { text: 'Início', path: '/techvisit/home', icon: <Home /> },
-    { text: 'Empresa', path: '/techvisit/administrator/organization', icon: <Language /> },
+    { text: 'Clientes', path: '/techvisit/customer', icon: <Language /> },
     { text: 'Contact', path: '/contact', icon: <ContactMail /> },
 ];
 
@@ -26,7 +26,7 @@ const Sidebar: React.FC<SidebarProps> = ({ drawerVisible, toggleDrawer }) => {
         <Box
             sx={{
                 width: 250,
-                backgroundColor: '#9c4215',
+                backgroundColor: '#c55117',
                 height: '100%',
                 color: 'white',
                 padding: 2,

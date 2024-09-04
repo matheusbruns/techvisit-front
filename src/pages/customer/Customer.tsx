@@ -16,7 +16,7 @@ const Organization = () => {
         const fetchData = async () => {
             try {
                 const response: any = await ApiService.get('/customer?organization=1');
-                const customers = response.data.map((customer: any) => ({
+                const customers = response.map((customer: any) => ({
                     id: customer.id,
                     name: `${customer.firstName} ${customer.lastName}`,
                     cpf: customer.cpf,
@@ -26,6 +26,7 @@ const Organization = () => {
                     complement: customer.complement,
                     cep: customer.cep,
                     organizationName: customer.organization.name,
+                    endereco: customer.street + " - " + customer.number + " " + (customer.complement ? ', ' + customer.complement : '')
                 }));
                 setRows(customers);
             } catch (error) {
@@ -59,24 +60,16 @@ const Organization = () => {
             disableColumnMenu: true
         },
         {
-            field: 'street',
+            field: 'endereco',
             headerName: 'Endereço',
-            width: 200,
+            width: 300,
             editable: false,
             disableColumnMenu: true,
-            valueGetter: (params: any) => `${params.row.street}, ${params.row.number} ${params.row.complement || ''}`
         },
         {
             field: 'cep',
             headerName: 'CEP',
             width: 100,
-            editable: false,
-            disableColumnMenu: true
-        },
-        {
-            field: 'organizationName',
-            headerName: 'Organização',
-            width: 200,
             editable: false,
             disableColumnMenu: true
         },

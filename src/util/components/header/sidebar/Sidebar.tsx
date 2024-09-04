@@ -1,26 +1,37 @@
 import React from 'react';
 import { Drawer, List, ListItem, ListItemText, IconButton, Divider, Typography, Box, ListItemIcon } from '@mui/material';
+import ApartmentIcon from '@mui/icons-material/Apartment';
+import PeopleIcon from '@mui/icons-material/People';
+import EngineeringIcon from '@mui/icons-material/Engineering';
+import GroupsIcon from '@mui/icons-material/Groups';
 import { Close, Home, Language, ContactMail } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../../../contexts/AuthContext';
 
 interface SidebarProps {
     drawerVisible: boolean;
     toggleDrawer: (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => void;
 }
 
-const menuItems = [
-    { text: 'Início', path: '/techvisit/home', icon: <Home /> },
-    { text: 'Clientes', path: '/techvisit/customer', icon: <Language /> },
-    { text: 'Contact', path: '/contact', icon: <ContactMail /> },
-];
-
 const Sidebar: React.FC<SidebarProps> = ({ drawerVisible, toggleDrawer }) => {
     const navigate = useNavigate();
 
-    const handleNavigation = (path: string) => {
-        navigate(path);
-        toggleDrawer(false)({} as React.MouseEvent); // Close drawer on navigation
+    const { user } = useAuth();
+
+    const handleNavigation = (path: string | undefined) => {
+        if (path) {
+            navigate(path);
+            toggleDrawer(false)({} as React.MouseEvent); // Close drawer on navigation
+        }
     };
+
+    const menuItems = [
+        { text: 'Início', path: '/techvisit/home', icon: <Home /> },
+        { text: 'Clientes', path: '/techvisit/customer', icon: <GroupsIcon /> },
+        { text: 'Técnicos', path: '/techvisit/technician', icon: <EngineeringIcon /> },
+        user?.role === "ADMIN" ? { text: 'Empresas', path: '/techvisit/organization', icon: <ApartmentIcon /> } : null,
+        user?.role === "ADMIN" ? { text: 'Usuários', path: '/techvisit/users', icon: <PeopleIcon /> } : null
+    ];
 
     const list = () => (
         <Box
@@ -45,10 +56,10 @@ const Sidebar: React.FC<SidebarProps> = ({ drawerVisible, toggleDrawer }) => {
             </Box>
             <Divider sx={{ backgroundColor: 'white', marginBottom: 2 }} />
             <List>
-                {menuItems.map((item, index) => (
-                    <ListItem button key={index} onClick={() => handleNavigation(item.path)}>
-                        <ListItemIcon sx={{ color: 'white' }}>{item.icon}</ListItemIcon>
-                        <ListItemText primary={item.text} primaryTypographyProps={{ style: { color: 'white' } }} />
+                {menuItems.filter(f => f !== null).map((item, index) => (
+                    <ListItem button key={index} onClick={() => handleNavigation(item?.path)}>
+                        <ListItemIcon sx={{ color: 'white' }}>{item?.icon}</ListItemIcon>
+                        <ListItemText primary={item?.text} primaryTypographyProps={{ style: { color: 'white' } }} />
                     </ListItem>
                 ))}
             </List>

@@ -1,8 +1,26 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 
 export const PublicRoute: React.FC<{ children: JSX.Element }> = ({ children }) => {
-    const { isAuthenticated } = useAuth();
-    return isAuthenticated ? <Navigate to="/techvisit/home" /> : children;
+
+    const { setUser, setToken } = useAuth();
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if(token) {
+            setToken(token);
+        }
+        
+        const user = localStorage.getItem('user');
+        if(user) {
+            setUser(JSON.parse(user))
+        }
+
+    }, []);
+
+    const token = localStorage.getItem("token");
+    const islogged = !!token;
+
+    return islogged && !children ? <Navigate to="/techvisit/home" /> : children;
 };

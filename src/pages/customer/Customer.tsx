@@ -124,7 +124,7 @@ const Organization = () => {
                         pageSizeOptions={[10]}
                     />
 
-                    <CustomerModal open={openModal} handleClose={handleCloseModal} />
+                    <CustomerModal open={openModal} handleClose={handleCloseModal} rows={rows} />
                 </Container>
             </Box>
         </>

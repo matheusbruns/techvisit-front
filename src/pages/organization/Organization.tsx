@@ -1,57 +1,77 @@
-import React, { useState } from 'react';
-import { Box, Container, Breadcrumbs, Typography, Link } from '@mui/material';
-import Header from '../../util/components/header/Header';
-import { GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
-import TopButtons from '../../util/components/topButtons/TopButtons';
-import GenericDataGrid from '../../util/components/dataGrid/GenericDataGrid';
-import CompanyModal from './components/CompanyModal';
+import React, { useEffect, useState } from 'react'
+import Header from '../../util/components/header/Header'
+import { Box, Container, Typography } from '@mui/material'
+import TopButtons from '../../util/components/topButtons/TopButtons'
+import GenericDataGrid from '../../util/components/dataGrid/GenericDataGrid'
+import { GridColDef, GridRowSelectionModel } from '@mui/x-data-grid'
+import OrganizationModal from './components/OrganizationModal'
+import ApiService from '../../conection/api';
+import { useAuth } from '../../contexts/AuthContext';
 
-const columns: GridColDef[] = [
-    {
-        field: 'id',
-        headerName: 'ID',
-        width: 90,
-        disableColumnMenu: true
-    },
-    {
-        field: 'externalCode',
-        headerName: 'Código Externo',
-        width: 250,
-        editable: false,
-        disableColumnMenu: true
-    },
-    {
-        field: 'name',
-        headerName: 'Nome',
-        width: 250,
-        editable: false,
-        disableColumnMenu: true
-    },
-    {
-        field: 'status',
-        headerName: 'Status',
-        type: 'boolean',
-        width: 210,
-        editable: false,
-        disableColumnMenu: true
-    },
-];
-
-const rows = [
-    { id: 1, externalCode: 'Snow', name: 'empresa', status: false },
-    { id: 2, externalCode: 'Lannister 1', name: 'empresa', status: false },
-    { id: 3, externalCode: 'Lannister 2', name: 'empresa', status: false },
-    { id: 4, externalCode: 'Lannister 3', name: 'empresa', status: false },
-    { id: 5, externalCode: 'Lannister 4', name: 'empresa', status: false },
-    { id: 6, externalCode: 'Lannister 5', name: 'empresa', status: false },
-    { id: 7, externalCode: 'Lannister 6', name: 'empresa', status: false },
-];
-
-export default function Organization() {
+export function Organization() {
     const [selectedRows, setSelectedRows] = useState<GridRowSelectionModel>([]);
-    const [rowsPerPage, setRowsPerPage] = React.useState(10);
-    const [page, setPage] = React.useState(0);
     const [openModal, setOpenModal] = useState(false);
+    const [rows, setRows] = useState<any[]>([]);
+    const AuthContext = useAuth();
+
+    const fetchData = async () => {
+        if (!AuthContext.user) return;
+
+        try {
+            const response: any = await ApiService.get(`/organization`);
+            const customers = response.map((organization: any) => ({
+                id: organization.id,
+                name: organization.name,
+                externalCode: organization.externalCode,
+                creationDate: organization.creationDate,
+                expirationDate: organization.expirationDate,
+            }));
+            setRows(customers);
+        } catch (error) {
+            console.error('Erro ao buscar dados', error);
+        }
+    };
+
+    const refreshGrid = () => {
+        fetchData();
+    };
+
+    useEffect(() => {
+        if (AuthContext.user) {
+            refreshGrid();
+        }
+    }, [AuthContext.user]);
+
+    const columns: GridColDef[] = [
+        {
+            field: 'name',
+            headerName: 'Nome',
+            width: 250,
+            editable: false,
+            disableColumnMenu: true
+        },
+        {
+            field: 'externalCode',
+            headerName: 'Código',
+            width: 150,
+            editable: false,
+            disableColumnMenu: true
+        },
+        {
+            field: 'creationDate',
+            headerName: 'Data de criação',
+            width: 200,
+            editable: false,
+            disableColumnMenu: true
+        },
+        {
+            field: 'expirationDate',
+            headerName: 'Data de expiração',
+            width: 300,
+            editable: false,
+            disableColumnMenu: true,
+        },
+    ];
 
     const handleSelectionChange = (newSelection: GridRowSelectionModel) => {
         setSelectedRows(newSelection);
@@ -63,7 +83,7 @@ export default function Organization() {
 
     const handleEditClick = () => {
         if (selectedRows.length === 1) {
-            console.log('Editar empresa com ID:', selectedRows[0]);
+            console.log('Editar cliente com ID:', selectedRows[0]);
         }
     };
 
@@ -73,31 +93,16 @@ export default function Organization() {
 
     const handleDeleteClick = () => {
         if (selectedRows.length > 0) {
-            console.log('Excluir empresas com IDs:', selectedRows);
+            console.log('Excluir clientes com IDs:', selectedRows);
         }
-    };
-
-    const handleChangeRowsPerPage = (event: any) => {
-        setRowsPerPage(+event.target.value);
-        setPage(0);
     };
 
     return (
         <>
             <Header />
-            <Box>
-                <Container >
-                    <Breadcrumbs aria-label="breadcrumb" sx={{ marginY: 5 }}>
-                        <Link underline="hover" color="inherit" href="/">
-                            Início
-                        </Link>
-                        <Link underline="hover" color="inherit" href="/">
-                            Administrador
-                        </Link>
-                        <Typography color="text.primary">Empresa</Typography>
-                    </Breadcrumbs>
-
-                    <Typography variant="h4" component="h1" gutterBottom>
+            <Box sx={{ width: '100%', marginTop: 5 }}>
+                <Container maxWidth={false}>
+                    <Typography variant="h4" component="h1" gutterBottom style={{ marginTop: 25 }}>
                         Empresas
                     </Typography>
 
@@ -113,17 +118,12 @@ export default function Organization() {
                     <GenericDataGrid
                         rows={rows}
                         columns={columns}
-                        selectedRows={selectedRows}
                         onRowSelectionChange={handleSelectionChange}
-                        pageSizeOptions={[5, 10, 20, 50]}
-                        rowsPerPage={rowsPerPage}
-                        onRowsPerPageChange={handleChangeRowsPerPage}
+                        pageSizeOptions={[10]}
                     />
-
-                    <CompanyModal open={openModal} handleClose={handleCloseModal} />
-
+                    <OrganizationModal open={openModal} handleClose={handleCloseModal} rows={rows} />
                 </Container>
             </Box>
         </>
-    );
+    )
 }

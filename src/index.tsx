@@ -6,25 +6,22 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { ptBR } from '@mui/material/locale';
 
 const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
+    document.getElementById('root') as HTMLElement
 );
 
 const theme = createTheme(
-  {
-    palette: {
-      primary: { main: '#ff6a00' },
+    {
+        palette: {
+            primary: { main: '#ff6a00' },
+        },
     },
-  },
-  ptBR
+    ptBR
 )
 
 root.render(
-
-  <React.StrictMode>
     <ThemeProvider theme={theme}>
-      <App />
+        <App />
     </ThemeProvider>
-  </React.StrictMode>
 );
 
 reportWebVitals();

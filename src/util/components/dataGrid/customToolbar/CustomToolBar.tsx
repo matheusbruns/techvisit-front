@@ -30,22 +30,6 @@ const CustomToolbar = () => {
                 }}
                 placeholder="Pesquisar..."
             />
-            {/* <Button
-                startIcon={<DownloadIcon />}
-                sx={{
-                    backgroundColor: '#f97316',
-                    color: '#ffffff',
-                    '&:hover': {
-                        backgroundColor: '#e56b0a',
-                    },
-                }}
-                onClick={() => {
-                    const toolbar = document.querySelector('.MuiDataGrid-toolbarContainer');
-                    toolbar && toolbar.querySelector('button[aria-label="Export"]')?.click();
-                }}
-            >
-                Exportar
-            </Button> */}
         </Box>
     );
 };

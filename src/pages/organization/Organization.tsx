@@ -1,41 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { Box, Container, Typography } from '@mui/material';
-import Header from '../../util/components/header/Header';
-import { GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
-import TopButtons from '../../util/components/topButtons/TopButtons';
-import GenericDataGrid from '../../util/components/dataGrid/GenericDataGrid';
-import CustomerModal from './components/CustomerModal';
-import ApiService from '../../conection/api';
+import React, { useState } from 'react'
+import Header from '../../util/components/header/Header'
+import { Box, Container, Typography } from '@mui/material'
+import TopButtons from '../../util/components/topButtons/TopButtons'
+import GenericDataGrid from '../../util/components/dataGrid/GenericDataGrid'
+import { GridColDef, GridRowSelectionModel } from '@mui/x-data-grid'
+import OrganizationModal from './components/OrganizationModal'
 
-const Organization = () => {
+export function Organization() {
     const [selectedRows, setSelectedRows] = useState<GridRowSelectionModel>([]);
     const [openModal, setOpenModal] = useState(false);
     const [rows, setRows] = useState<any[]>([]);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response: any = await ApiService.get('/customer?organization=1');
-                const customers = response.map((customer: any) => ({
-                    id: customer.id,
-                    name: `${customer.firstName} ${customer.lastName}`,
-                    cpf: customer.cpf,
-                    phoneNumber: customer.phoneNumber,
-                    street: customer.street,
-                    number: customer.number,
-                    complement: customer.complement,
-                    cep: customer.cep,
-                    organizationName: customer.organization.name,
-                    endereco: customer.street + " - " + customer.number + " " + (customer.complement ? ', ' + customer.complement : '')
-                }));
-                setRows(customers);
-            } catch (error) {
-                console.error('Erro ao buscar dados', error);
-            }
-        };
-
-        fetchData();
-    }, []);
 
     const columns: GridColDef[] = [
         {
@@ -46,32 +21,25 @@ const Organization = () => {
             disableColumnMenu: true
         },
         {
-            field: 'cpf',
-            headerName: 'CPF',
+            field: 'externalCode',
+            headerName: 'Código',
             width: 150,
             editable: false,
             disableColumnMenu: true
         },
         {
-            field: 'phoneNumber',
-            headerName: 'Telefone',
+            field: 'creationDate',
+            headerName: 'Data de criação',
             width: 200,
             editable: false,
             disableColumnMenu: true
         },
         {
-            field: 'endereco',
-            headerName: 'Endereço',
+            field: 'expirationDate',
+            headerName: 'Data de expiração',
             width: 300,
             editable: false,
             disableColumnMenu: true,
-        },
-        {
-            field: 'cep',
-            headerName: 'CEP',
-            width: 100,
-            editable: false,
-            disableColumnMenu: true
         },
     ];
 
@@ -105,11 +73,11 @@ const Organization = () => {
             <Box sx={{ width: '100%', marginTop: 5 }}>
                 <Container maxWidth={false}>
                     <Typography variant="h4" component="h1" gutterBottom style={{ marginTop: 25 }}>
-                        Clientes
+                        Empresas
                     </Typography>
 
                     <TopButtons
-                        buttonLabel="Novo Cliente"
+                        buttonLabel="Nova Empresa"
                         onAddClick={handleAddClick}
                         onEditClick={handleEditClick}
                         onDeleteClick={handleDeleteClick}
@@ -123,12 +91,9 @@ const Organization = () => {
                         onRowSelectionChange={handleSelectionChange}
                         pageSizeOptions={[10]}
                     />
-
-                    <CustomerModal open={openModal} handleClose={handleCloseModal} rows={rows} />
+                    <OrganizationModal open={openModal} handleClose={handleCloseModal} rows={rows} />
                 </Container>
             </Box>
         </>
-    );
+    )
 }
-
-export default Organization;

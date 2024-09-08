@@ -22,3 +22,22 @@ export interface Customer {
 export interface ApiResponse {
     data: Customer[];
 }
+
+export const initialCustomerData: Customer = {
+    id: 0,
+    firstName: '',
+    lastName: '',
+    cpf: '',
+    phoneNumber: '',
+    street: '',
+    number: '',
+    complement: '',
+    cep: '',
+    organization: {
+        id: 1,
+        externalCode: 'Default Organization',
+        name: 'default',
+        creationDate: '2024-01-01',
+        expirationDate: '2024-01-01'
+    },
+};

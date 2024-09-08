@@ -1,12 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, Box, TextField, Button, Typography, Grid } from '@mui/material';
 import { toast } from 'react-toastify';
-
-interface CustomerModalProps {
-    open: boolean;
-    handleClose: () => void;
-    rows: any[];
-}
+import ApiService from '../../../conection/api';
+import { Customer, initialCustomerData } from '../ICustomer';
+import { useAuth } from '../../../contexts/AuthContext';
 
 const isValidCPF = (cpf: string) => {
     if (!cpf) return false;
@@ -69,17 +66,30 @@ const formatCEP = (value: string) => {
     return value;
 };
 
-const CustomerModal: React.FC<CustomerModalProps> = ({ open, handleClose, rows }) => {
-    const [customerData, setCustomerData] = useState({
-        firstName: '',
-        lastName: '',
-        cpf: '',
-        phoneNumber: '',
-        street: '',
-        number: '',
-        complement: '',
-        cep: '',
-    });
+interface CustomerModalProps {
+    open: boolean;
+    handleClose: () => void;
+    rows: any[];
+    customerDataSelected?: any;
+    onSuccess?: () => void;
+}
+
+const CustomerModal: React.FC<CustomerModalProps> = ({ open, handleClose, rows, customerDataSelected, onSuccess }) => {
+    const [customerData, setCustomerData] = useState<Customer>(initialCustomerData);
+    const AuthContext = useAuth();
+
+    console.log(customerDataSelected);
+
+    useEffect(() => {
+        if (customerDataSelected) {
+            console.log('customerDataSelected', customerDataSelected);
+            setCustomerData({
+                ...customerDataSelected,
+            });
+        } else {
+            setCustomerData(initialCustomerData);
+        }
+    }, [customerDataSelected]);
 
     const [errors, setErrors] = useState({
         firstName: false,
@@ -118,7 +128,10 @@ const CustomerModal: React.FC<CustomerModalProps> = ({ open, handleClose, rows }
     };
 
     const validateForm = () => {
-        const cpfExists = rows.some((customer: any) => customer.cpf === customerData.cpf);
+
+        const cpfExists = rows.some((customer: any) =>
+            customer.cpf === customerData.cpf && customer.id !== customerData.id
+        );
 
         const newErrors = {
             firstName: !customerData.firstName,
@@ -140,35 +153,30 @@ const CustomerModal: React.FC<CustomerModalProps> = ({ open, handleClose, rows }
         return Object.values(newErrors).every(x => !x);
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (validateForm()) {
             console.log('Dados do cliente enviados:', customerData);
-            setCustomerData({
-                firstName: '',
-                lastName: '',
-                cpf: '',
-                phoneNumber: '',
-                street: '',
-                number: '',
-                complement: '',
-                cep: '',
-            });
-            handleClose();
-            toast.success("Cliente salvo com sucesso!");
+            try {
+                const organization = AuthContext.user.organization;
+                customerData.organization = organization;
+                const response: any = await ApiService.post('/customer', customerData);
+
+                toast.success("Cliente salvo com sucesso!");
+
+                if (onSuccess) {
+                    onSuccess();
+                }
+
+                setCustomerData(initialCustomerData);
+                handleClose();
+            } catch (error) {
+                toast.error('Erro ao salvar novo cliente');
+            }
         }
     };
 
     const handleCancel = () => {
-        setCustomerData({
-            firstName: '',
-            lastName: '',
-            cpf: '',
-            phoneNumber: '',
-            street: '',
-            number: '',
-            complement: '',
-            cep: '',
-        });
+        setCustomerData(initialCustomerData);
         setErrors({
             firstName: false,
             lastName: false,
@@ -200,7 +208,7 @@ const CustomerModal: React.FC<CustomerModalProps> = ({ open, handleClose, rows }
                 }}
             >
                 <Typography variant="h6" component="h2" gutterBottom>
-                    Cadastrar Novo Cliente
+                    {customerDataSelected ? 'Editar Cliente' : 'Cadastrar Novo Cliente'}
                 </Typography>
                 <Grid container spacing={2}>
                     <Grid item xs={6}>

@@ -43,8 +43,11 @@ class ApiService {
             const status = error.response.status;
             const message = error.response.data.message || 'Ocorreu um erro no servidor';
 
-            if (status === 403) {
-                toast.error('Acesso negado: você não tem permissão para esta ação.');
+            if (status === 403 || 401) {
+                toast.error('Sessão expirada. Você será redirecionado para o login.');
+                localStorage.removeItem("user");
+                localStorage.removeItem("token");
+                window.location.reload();
             } else {
                 toast.error(message);
             }

@@ -6,36 +6,51 @@ import TopButtons from '../../util/components/topButtons/TopButtons';
 import GenericDataGrid from '../../util/components/dataGrid/GenericDataGrid';
 import CustomerModal from './components/CustomerModal';
 import ApiService from '../../conection/api';
+import { useAuth } from '../../contexts/AuthContext';
+import { toast } from 'react-toastify';
 
-const Organization = () => {
+const Customer = () => {
     const [selectedRows, setSelectedRows] = useState<GridRowSelectionModel>([]);
     const [openModal, setOpenModal] = useState(false);
     const [rows, setRows] = useState<any[]>([]);
+    const [customerDataSelected, setCustomerDataSelected] = useState<any | null>(null);
+    const AuthContext = useAuth();
+
+    const fetchData = async () => {
+        if (!AuthContext.user) return;
+
+        try {
+            const organization = AuthContext.user.organization.id;
+            const response: any = await ApiService.get(`/customer?organization=${organization}`);
+            const customers = response.map((customer: any) => ({
+                id: customer.id,
+                name: `${customer.firstName} ${customer.lastName}`,
+                firstName: customer.firstName,
+                lastName: customer.lastName,
+                cpf: customer.cpf,
+                phoneNumber: customer.phoneNumber,
+                street: customer.street,
+                number: customer.number,
+                complement: customer.complement,
+                cep: customer.cep,
+                organizationName: customer.organization.name,
+                endereco: customer.street + " - " + customer.number + " " + (customer.complement ? ', ' + customer.complement : '')
+            }));
+            setRows(customers);
+        } catch (error) {
+            console.error('Erro ao buscar dados', error);
+        }
+    };
+
+    const refreshGrid = () => {
+        fetchData();
+    };
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response: any = await ApiService.get('/customer?organization=1');
-                const customers = response.map((customer: any) => ({
-                    id: customer.id,
-                    name: `${customer.firstName} ${customer.lastName}`,
-                    cpf: customer.cpf,
-                    phoneNumber: customer.phoneNumber,
-                    street: customer.street,
-                    number: customer.number,
-                    complement: customer.complement,
-                    cep: customer.cep,
-                    organizationName: customer.organization.name,
-                    endereco: customer.street + " - " + customer.number + " " + (customer.complement ? ', ' + customer.complement : '')
-                }));
-                setRows(customers);
-            } catch (error) {
-                console.error('Erro ao buscar dados', error);
-            }
-        };
-
-        fetchData();
-    }, []);
+        if (AuthContext.user) {
+            refreshGrid();
+        }
+    }, [AuthContext.user]);
 
     const columns: GridColDef[] = [
         {
@@ -85,7 +100,13 @@ const Organization = () => {
 
     const handleEditClick = () => {
         if (selectedRows.length === 1) {
-            console.log('Editar cliente com ID:', selectedRows[0]);
+            const customerToEdit = rows.find((row) => row.id === selectedRows[0]);
+
+            if (customerToEdit) {
+                setCustomerDataSelected(customerToEdit);
+                setOpenModal(true);
+                refreshGrid();
+            }
         }
     };
 
@@ -93,9 +114,21 @@ const Organization = () => {
         setOpenModal(false);
     };
 
-    const handleDeleteClick = () => {
+    const handleDeleteClick = async () => {
         if (selectedRows.length > 0) {
-            console.log('Excluir clientes com IDs:', selectedRows);
+            try {
+                const rowsToDelete = selectedRows.map((rowId: any) => parseInt(rowId));
+                await ApiService.delete('/customer', {
+                    data: rowsToDelete
+                });
+
+                toast.success("Cliente excluído com sucesso");
+                refreshGrid();
+                setSelectedRows([]);
+            } catch (error) {
+                toast.error("Erro ao excluir cliente");
+            }
+
         }
     };
 
@@ -124,11 +157,17 @@ const Organization = () => {
                         pageSizeOptions={[10]}
                     />
 
-                    <CustomerModal open={openModal} handleClose={handleCloseModal} rows={rows} />
+                    <CustomerModal
+                        open={openModal}
+                        handleClose={handleCloseModal}
+                        rows={rows}
+                        customerDataSelected={customerDataSelected}
+                        onSuccess={refreshGrid}
+                    />
                 </Container>
             </Box>
         </>
     );
 }
 
-export default Organization;
+export default Customer;

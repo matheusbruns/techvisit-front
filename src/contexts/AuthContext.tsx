@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { User } from "./IAuthContext";
 
 interface AuthContextType {
     user: any;
@@ -21,14 +22,17 @@ export function useAuth() {
 }
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [user, setUser] = useState<any>(null);
-    const [token, setToken] = useState<any>(null);
+    const [user, setUser] = useState<User | null>(null);
+    const [token, setToken] = useState<string | null>(null);
     const navigate = useNavigate();
 
     useEffect(() => {
         const storedUser = localStorage.getItem("user");
-        if (storedUser) {
+        const storedToken = localStorage.getItem("token");
+
+        if (storedUser && storedToken) {
             setUser(JSON.parse(storedUser));
+            setToken(storedToken);
         }
     }, []);
 

@@ -1,5 +1,5 @@
-import React from 'react';
-import { Box, Button, IconButton } from '@mui/material';
+import React, { useState } from 'react';
+import { Box, Button, IconButton, Popover, Typography } from '@mui/material';
 import { Add, Edit, Delete } from '@mui/icons-material';
 
 interface ActionButtonsProps {
@@ -19,6 +19,24 @@ export default function TopButtons({
     isEditDisabled,
     isDeleteDisabled
 }: ActionButtonsProps) {
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+    const handleDeleteClick = (event: React.MouseEvent<HTMLElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClosePopover = () => {
+        setAnchorEl(null);
+    };
+
+    const handleConfirmDelete = () => {
+        onDeleteClick();
+        handleClosePopover();
+    };
+
+    const open = Boolean(anchorEl);
+    const popoverId = open ? 'delete-confirm-popover' : undefined;
+
     return (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: 2 }}>
             <Button
@@ -39,9 +57,44 @@ export default function TopButtons({
                 <IconButton onClick={onEditClick} disabled={isEditDisabled}>
                     <Edit />
                 </IconButton>
-                <IconButton onClick={onDeleteClick} disabled={isDeleteDisabled}>
+                <IconButton onClick={handleDeleteClick} disabled={isDeleteDisabled}>
                     <Delete />
                 </IconButton>
+
+                <Popover
+                    sx={{ marginTop: 1 }}
+                    id={popoverId}
+                    open={open}
+                    anchorEl={anchorEl}
+                    onClose={handleClosePopover}
+                    anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'center',
+                    }}
+                    transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'center',
+                    }}
+                >
+                    <Box sx={{ p: 2 }}>
+                        <Typography>Tem certeza que deseja excluir?</Typography>
+                        <Box sx={{ display: 'flex', gap: 1, marginTop: 1 }}>
+                            <Button
+                                variant="outlined"
+                                onClick={handleClosePopover}
+                            >
+                                Cancelar
+                            </Button>
+                            <Button
+                                variant="contained"
+                                color="error"
+                                onClick={handleConfirmDelete}
+                            >
+                                Excluir
+                            </Button>
+                        </Box>
+                    </Box>
+                </Popover>
             </Box>
         </Box>
     );

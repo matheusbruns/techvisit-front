@@ -16,6 +16,8 @@ $input-border-color: #f97316;
         justify-content: center;
         align-items: center;
         padding: 20px;
+        text-align: center;
+        font-weight: bold;
 
         .journey {
             color: $text-color;
@@ -23,7 +25,7 @@ $input-border-color: #f97316;
 
         .illustration {
             width: 80%;
-            max-width: 350px;
+            max-width: 550px;
         }
     }
 
@@ -36,9 +38,15 @@ $input-border-color: #f97316;
         align-items: center;
         gap: 20px;
 
-        .login-logo img {
-            max-width: 350px;
-            margin-bottom: 0px;
+        .login-logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            img {
+                width: 100%;
+                margin-bottom: 10px;
+            }
         }
 
         h2 {
@@ -110,6 +118,17 @@ $input-border-color: #f97316;
                     background-color: darken($primary-color, 10%);
                 }
             }
+        }
+    }
+
+    @media (max-width: 768px) {
+        .login-left {
+            display: none;
+        }
+
+        .login-right {
+            flex: 1;
+            width: 100%;
         }
     }
 }

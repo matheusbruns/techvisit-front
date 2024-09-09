@@ -1,16 +1,46 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Header from '../../util/components/header/Header'
 import { Box, Container, Typography } from '@mui/material'
 import TopButtons from '../../util/components/topButtons/TopButtons'
 import GenericDataGrid from '../../util/components/dataGrid/GenericDataGrid'
 import { GridColDef, GridRowSelectionModel } from '@mui/x-data-grid'
 import OrganizationModal from './components/OrganizationModal'
+import ApiService from '../../conection/api';
+import { useAuth } from '../../contexts/AuthContext';
 
 export function Organization() {
     const [selectedRows, setSelectedRows] = useState<GridRowSelectionModel>([]);
     const [openModal, setOpenModal] = useState(false);
     const [rows, setRows] = useState<any[]>([]);
+    const AuthContext = useAuth();
 
+    const fetchData = async () => {
+        if (!AuthContext.user) return;
+
+        try {
+            const response: any = await ApiService.get(`/organization`);
+            const customers = response.map((organization: any) => ({
+                id: organization.id,
+                name: organization.name,
+                externalCode: organization.externalCode,
+                creationDate: organization.creationDate,
+                expirationDate: organization.expirationDate,
+            }));
+            setRows(customers);
+        } catch (error) {
+            console.error('Erro ao buscar dados', error);
+        }
+    };
+
+    const refreshGrid = () => {
+        fetchData();
+    };
+
+    useEffect(() => {
+        if (AuthContext.user) {
+            refreshGrid();
+        }
+    }, [AuthContext.user]);
 
     const columns: GridColDef[] = [
         {

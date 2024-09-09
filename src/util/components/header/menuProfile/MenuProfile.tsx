@@ -15,7 +15,6 @@ import { useAuth } from '../../../../contexts/AuthContext';
 export default function MenuProfile() {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
-    const [username, setUsername] = React.useState("Matheus bruns");
     const { logout } = useAuth();
 
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -40,23 +39,9 @@ export default function MenuProfile() {
                 textAlign: 'center',
                 cursor: 'pointer',
                 padding: '13px',
-                backgroundColor: '#dbdbdb',
-                width: 200
+                width: 60
             }} onClick={handleClick}>
                 <Avatar sx={{ width: 32, height: 32 }} />
-                <Typography
-                    sx={{
-                        paddingLeft: 2,
-                        paddingRight: 2,
-                        color: '#f97316',
-                        maxWidth: 120,
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                    }}
-                >
-                    {username}
-                </Typography>
                 {open ? (
                     <ExpandLessIcon sx={{ color: '#bdbdbd' }} />
                 ) : (

@@ -3,7 +3,7 @@ import { Login } from "../pages/login/Login";
 import { AuthProvider } from "../contexts/AuthContext";
 import { PublicRoute } from "./components/PublicRoute";
 import { PrivateRoute } from "./components/PrivateRoute";
-import { Home } from "../pages/home/Home";
+import Home from "../pages/home/Home";
 import Customer from "../pages/customer/Customer";
 import { Organization } from "../pages/organization/Organization";
 

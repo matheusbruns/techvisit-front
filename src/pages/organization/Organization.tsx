@@ -7,11 +7,13 @@ import { GridColDef, GridRowSelectionModel } from '@mui/x-data-grid'
 import OrganizationModal from './components/OrganizationModal'
 import ApiService from '../../conection/api';
 import { useAuth } from '../../contexts/AuthContext';
+import moment from 'moment'
 
 export function Organization() {
     const [selectedRows, setSelectedRows] = useState<GridRowSelectionModel>([]);
     const [openModal, setOpenModal] = useState(false);
     const [rows, setRows] = useState<any[]>([]);
+    const [organizationDataSelected, setOrganizationDataSelected] = useState<any | null>(null);
     const AuthContext = useAuth();
 
     const fetchData = async () => {
@@ -24,7 +26,9 @@ export function Organization() {
                 name: organization.name,
                 externalCode: organization.externalCode,
                 creationDate: organization.creationDate,
+                formattedCreationDate: organization.creationDate !== null ? moment(organization.creationDate).format('DD/MM/YYYY') : "",
                 expirationDate: organization.expirationDate,
+                formattedExpirationDate: organization.expirationDate !== null ? moment(organization.expirationDate).format('DD/MM/YYYY') : "",
             }));
             setRows(customers);
         } catch (error) {
@@ -46,26 +50,26 @@ export function Organization() {
         {
             field: 'name',
             headerName: 'Nome',
-            width: 250,
+            width: 350,
             editable: false,
             disableColumnMenu: true
         },
         {
             field: 'externalCode',
             headerName: 'Código',
-            width: 150,
+            width: 250,
             editable: false,
             disableColumnMenu: true
         },
         {
-            field: 'creationDate',
+            field: 'formattedCreationDate',
             headerName: 'Data de criação',
-            width: 200,
+            width: 250,
             editable: false,
             disableColumnMenu: true
         },
         {
-            field: 'expirationDate',
+            field: 'formattedExpirationDate',
             headerName: 'Data de expiração',
             width: 300,
             editable: false,
@@ -78,12 +82,18 @@ export function Organization() {
     };
 
     const handleAddClick = () => {
+        setOrganizationDataSelected(null);
         setOpenModal(true);
     };
 
     const handleEditClick = () => {
         if (selectedRows.length === 1) {
-            console.log('Editar cliente com ID:', selectedRows[0]);
+            const organizationToEdit = rows.find((row) => row.id === selectedRows[0]);
+
+            if (organizationToEdit) {
+                setOrganizationDataSelected(organizationToEdit);
+                setOpenModal(true);
+            }
         }
     };
 
@@ -112,7 +122,8 @@ export function Organization() {
                         onEditClick={handleEditClick}
                         onDeleteClick={handleDeleteClick}
                         isEditDisabled={selectedRows.length !== 1}
-                        isDeleteDisabled={selectedRows.length === 0}
+                        // isDeleteDisabled={selectedRows.length === 0}
+                        isDeleteDisabled={true}
                     />
 
                     <GenericDataGrid
@@ -121,7 +132,15 @@ export function Organization() {
                         onRowSelectionChange={handleSelectionChange}
                         pageSizeOptions={[10]}
                     />
-                    <OrganizationModal open={openModal} handleClose={handleCloseModal} rows={rows} />
+
+                    <OrganizationModal
+                        open={openModal}
+                        handleClose={handleCloseModal}
+                        rows={rows}
+                        organizationDataSelected={organizationDataSelected}
+                        onSuccess={refreshGrid}
+                    />
+
                 </Container>
             </Box>
         </>

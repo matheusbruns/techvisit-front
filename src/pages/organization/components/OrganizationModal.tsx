@@ -1,38 +1,50 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, Box, TextField, Button, Typography, Grid } from '@mui/material';
 import { toast } from 'react-toastify';
 import { DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import ApiService from '../../../conection/api';
 import dayjs from 'dayjs';
+import { initialOrganizationData, Organization } from '../IOrganization';
 
 interface OrganizationModalProps {
     open: boolean;
     handleClose: () => void;
     rows: any[];
+    organizationDataSelected?: Organization | null;
+    onSuccess?: () => void;
 }
 
-const OrganizationModal: React.FC<OrganizationModalProps> = ({ open, handleClose, rows }) => {
-    const [organizationData, setOrganizationData] = useState({
-        name: '',
-        externalCode: '',
-        expirationDate: dayjs().format('YYYY-MM-DD'),
-    });
+const OrganizationModal: React.FC<OrganizationModalProps> = ({ open, handleClose, rows, organizationDataSelected, onSuccess }) => {
+    const [organizationData, setOrganizationData] = useState<Organization>(initialOrganizationData);
 
     const [errors, setErrors] = useState({
         name: false,
         externalCode: false,
     });
 
-    const validateForm = () => {
+    useEffect(() => {
+        if (organizationDataSelected) {
+            setOrganizationData(organizationDataSelected);
+        } else {
+            setOrganizationData(initialOrganizationData);
+        }
+    }, [organizationDataSelected]);
 
-        const externalCodeExists = rows.some((organization: any) => organization.externalCode === organizationData.externalCode);
+    const validateForm = () => {
+        const externalCodeExists = rows.some(
+            (organization: Organization) =>
+                organization.externalCode === organizationData.externalCode && organization.id !== organizationData.id
+        );
+
         const newErrors = {
             name: !organizationData.name,
             externalCode: !organizationData.externalCode || externalCodeExists,
         };
 
         setErrors(newErrors);
+
         if (externalCodeExists) {
             toast.error("Código já cadastrado!");
         }
@@ -40,25 +52,32 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ open, handleClose
         return Object.values(newErrors).every((x) => !x);
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (validateForm()) {
-            console.log('Dados da empresa enviados:', organizationData);
-            setOrganizationData({
-                name: '',
-                externalCode: '',
-                expirationDate: dayjs().format('YYYY-MM-DD'),
-            });
-            handleClose();
-            toast.success('Empresa cadastrada com sucesso!');
+            try {
+                if (organizationData.id) {
+                    await ApiService.put('/organization', organizationData);
+                    toast.success('Empresa atualizada com sucesso!');
+                } else {
+                    await ApiService.post('/organization', organizationData);
+                    toast.success('Empresa cadastrada com sucesso!');
+                }
+
+                if (onSuccess) {
+                    onSuccess();
+                }
+
+                setOrganizationData(initialOrganizationData);
+                handleClose();
+            } catch (error) {
+                toast.error('Erro ao salvar!');
+            }
         }
     };
 
     const handleCancel = () => {
-        setOrganizationData({
-            name: '',
-            externalCode: '',
-            expirationDate: dayjs().format('YYYY-MM-DD'),
-        });
+        setOrganizationData(initialOrganizationData);
+        setErrors({name: false, externalCode: false});
         handleClose();
     };
 
@@ -72,7 +91,7 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ open, handleClose
     const handleDateChange = (newDate: any) => {
         setOrganizationData({
             ...organizationData,
-            expirationDate: newDate.format('YYYY-MM-DD'),
+            expirationDate: newDate ? newDate.format('YYYY-MM-DD') : dayjs().add(2, 'year').format('YYYY-MM-DD'),
         });
     };
 
@@ -94,7 +113,7 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ open, handleClose
                 }}
             >
                 <Typography variant="h6" component="h2" gutterBottom>
-                    Cadastrar Nova Empresa
+                    {organizationData.id ? 'Editar Empresa' : 'Cadastrar Nova Empresa'}
                 </Typography>
                 <Grid container spacing={2}>
                     <Grid item xs={6}>
@@ -134,13 +153,12 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ open, handleClose
                                 slotProps={{
                                     textField: {
                                         fullWidth: true,
-                                        margin: "normal",
+                                        margin: 'normal',
                                     },
                                 }}
                             />
                         </LocalizationProvider>
                     </Grid>
-
                 </Grid>
                 <Box mt={3} display="flex" justifyContent="flex-end">
                     <Button

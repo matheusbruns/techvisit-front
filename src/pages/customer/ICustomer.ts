@@ -1,10 +1,4 @@
-export interface Organization {
-    id: number;
-    externalCode: string;
-    name: string;
-    creationDate: string | null;
-    expirationDate: string | null;
-}
+import { Organization } from "../organization/IOrganization";
 
 export interface Customer {
     id: number;

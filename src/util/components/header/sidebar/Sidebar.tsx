@@ -4,7 +4,7 @@ import ApartmentIcon from '@mui/icons-material/Apartment';
 import PeopleIcon from '@mui/icons-material/People';
 import EngineeringIcon from '@mui/icons-material/Engineering';
 import GroupsIcon from '@mui/icons-material/Groups';
-import { Close, Home, Language, ContactMail } from '@mui/icons-material';
+import { Close, Home, Assignment } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../../contexts/AuthContext';
 
@@ -26,7 +26,8 @@ const Sidebar: React.FC<SidebarProps> = ({ drawerVisible, toggleDrawer }) => {
     };
 
     const menuItems = [
-        { text: 'Início', path: '/techvisit/home', icon: <Home /> },
+        { text: 'Visão Geral', path: '/techvisit/home', icon: <Home /> },
+        { text: 'Visitas', path: '/techvisit/visits', icon: <Assignment /> },
         { text: 'Clientes', path: '/techvisit/customer', icon: <GroupsIcon /> },
         { text: 'Técnicos', path: '/techvisit/technician', icon: <EngineeringIcon /> },
         user?.role === "ADMIN" ? { text: 'Empresas', path: '/techvisit/organization', icon: <ApartmentIcon /> } : null,

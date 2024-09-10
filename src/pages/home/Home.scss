@@ -1,0 +1,32 @@
+.rbc-calendar {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.rbc-toolbar-label {
+    font-weight: bold;
+    text-transform: capitalize;
+    color: #000000;
+    font-size: larger;
+}
+
+.rbc-btn-group>button {
+    background-color: #f97316;
+    color: #ffffff;
+    border: none;
+    padding: 10px 15px;
+    margin: 2px;
+    cursor: pointer;
+
+}
+
+.rbc-btn-group>button:focus,
+.rbc-btn-group>button:active,
+.rbc-btn-group>button.rbc-active {
+    color: #000000;
+    outline: none;
+}
+
+.rbc-btn-group>button:hover {
+    background-color: #f97316;
+    color: #ffffff;
+}

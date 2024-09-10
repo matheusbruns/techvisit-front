@@ -95,6 +95,7 @@ const Customer = () => {
     };
 
     const handleAddClick = () => {
+        setCustomerDataSelected(null);
         setOpenModal(true);
     };
 
@@ -105,7 +106,6 @@ const Customer = () => {
             if (customerToEdit) {
                 setCustomerDataSelected(customerToEdit);
                 setOpenModal(true);
-                refreshGrid();
             }
         }
     };

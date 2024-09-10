@@ -77,6 +77,7 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ open, handleClose
 
     const handleCancel = () => {
         setOrganizationData(initialOrganizationData);
+        setErrors({name: false, externalCode: false});
         handleClose();
     };
 
@@ -90,7 +91,7 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ open, handleClose
     const handleDateChange = (newDate: any) => {
         setOrganizationData({
             ...organizationData,
-            expirationDate: newDate.format('YYYY-MM-DD'),
+            expirationDate: newDate ? newDate.format('YYYY-MM-DD') : dayjs().add(2, 'year').format('YYYY-MM-DD'),
         });
     };
 

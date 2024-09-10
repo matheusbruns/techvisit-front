@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+
 export interface Organization {
     id: number;
     externalCode: string;
@@ -11,5 +13,5 @@ export const initialOrganizationData: Organization = {
     externalCode: '',
     name: '',
     creationDate: null,
-    expirationDate: null,
+    expirationDate: dayjs().add(2, 'year').format('YYYY-MM-DD'),
 };

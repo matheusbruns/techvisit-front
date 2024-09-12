@@ -30,8 +30,8 @@ const Sidebar: React.FC<SidebarProps> = ({ drawerVisible, toggleDrawer }) => {
         { text: 'Visitas', path: '/techvisit/visits', icon: <Assignment /> },
         { text: 'Clientes', path: '/techvisit/customer', icon: <GroupsIcon /> },
         { text: 'Técnicos', path: '/techvisit/technician', icon: <EngineeringIcon /> },
-        user?.role === "ADMIN" ? { text: 'Empresas', path: '/techvisit/organization', icon: <ApartmentIcon /> } : null,
-        user?.role === "ADMIN" ? { text: 'Usuários', path: '/techvisit/users', icon: <PeopleIcon /> } : null
+        user?.role === "ADMIN" ? { text: 'Empresas', path: '/admin/organization', icon: <ApartmentIcon /> } : null,
+        user?.role === "ADMIN" ? { text: 'Usuários', path: '/admin/users', icon: <PeopleIcon /> } : null
     ];
 
     const list = () => (

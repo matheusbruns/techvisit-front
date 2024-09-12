@@ -1,7 +1,6 @@
 import React from 'react';
 import { Box, Button } from '@mui/material';
-import { GridToolbarQuickFilter, GridToolbarExport } from '@mui/x-data-grid';
-import DownloadIcon from '@mui/icons-material/Download';
+import { GridToolbarQuickFilter } from '@mui/x-data-grid';
 
 const CustomToolbar = () => {
     return (

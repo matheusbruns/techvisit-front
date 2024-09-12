@@ -77,7 +77,7 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ open, handleClose
 
     const handleCancel = () => {
         setOrganizationData(initialOrganizationData);
-        setErrors({name: false, externalCode: false});
+        setErrors({ name: false, externalCode: false });
         handleClose();
     };
 

@@ -14,14 +14,15 @@ export function Organization() {
     const [openModal, setOpenModal] = useState(false);
     const [rows, setRows] = useState<any[]>([]);
     const [organizationDataSelected, setOrganizationDataSelected] = useState<any | null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
     const AuthContext = useAuth();
 
     const fetchData = async () => {
         if (!AuthContext.user) return;
-
+        setLoading(true);
         try {
             const response: any = await ApiService.get(`/organization`);
-            const customers = response.map((organization: any) => ({
+            const organizations = response.map((organization: any) => ({
                 id: organization.id,
                 name: organization.name,
                 externalCode: organization.externalCode,
@@ -30,9 +31,11 @@ export function Organization() {
                 expirationDate: organization.expirationDate,
                 formattedExpirationDate: organization.expirationDate !== null ? moment(organization.expirationDate).format('DD/MM/YYYY') : "",
             }));
-            setRows(customers);
+            setRows(organizations);
         } catch (error) {
             console.error('Erro ao buscar dados', error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -109,7 +112,6 @@ export function Organization() {
 
     return (
         <>
-            <Header />
             <Box sx={{ width: '100%', marginTop: 5 }}>
                 <Container maxWidth={false}>
                     <Typography variant="h4" component="h1" gutterBottom style={{ marginTop: 25 }}>
@@ -131,6 +133,7 @@ export function Organization() {
                         columns={columns}
                         onRowSelectionChange={handleSelectionChange}
                         pageSizeOptions={[10]}
+                        loading={loading}
                     />
 
                     <OrganizationModal

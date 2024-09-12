@@ -78,6 +78,7 @@ const GenericDataGrid: React.FC<GenericDataGridProps> = ({
     columns,
     onRowSelectionChange,
     pageSizeOptions,
+    loading,
 }) => {
 
     return (
@@ -106,6 +107,7 @@ const GenericDataGrid: React.FC<GenericDataGridProps> = ({
                         backgroundColor: '#ffe0b2 !important',
                     },
                 }}
+                loading={loading}
                 rows={rows}
                 columns={columns}
                 autoPageSize={true}

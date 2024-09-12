@@ -8,19 +8,23 @@ export const PublicRoute: React.FC<{ children: JSX.Element }> = ({ children }) =
 
     useEffect(() => {
         const token = localStorage.getItem('token');
-        if(token) {
+        if (token) {
             setToken(token);
         }
-        
+
         const user = localStorage.getItem('user');
-        if(user) {
+        if (user) {
             setUser(JSON.parse(user))
         }
 
     }, []);
 
     const token = localStorage.getItem("token");
-    const islogged = !!token;
+    const isLogged = !!token;
 
-    return islogged && !children ? <Navigate to="/techvisit/home" /> : children;
+    if (isLogged) {
+        return <Navigate to="/techvisit/home" />;
+    }
+
+    return children;
 };

@@ -1,18 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Container, Typography } from '@mui/material';
-import { GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 import TopButtons from '../../util/components/topButtons/TopButtons';
 import GenericDataGrid from '../../util/components/dataGrid/GenericDataGrid';
-import CustomerModal from './components/CustomerModal';
+import { GridColDef, GridRowSelectionModel, GridValueGetter } from '@mui/x-data-grid';
+import UserModal from './components/UserModal';
 import ApiService from '../../conection/api';
 import { useAuth } from '../../contexts/AuthContext';
+import moment from 'moment';
+import { Organization } from '../organization/IOrganization';
+import { User } from './IUser';
 import { toast } from 'react-toastify';
 
-const Customer = () => {
+export function Users() {
     const [selectedRows, setSelectedRows] = useState<GridRowSelectionModel>([]);
     const [openModal, setOpenModal] = useState(false);
     const [rows, setRows] = useState<any[]>([]);
-    const [customerDataSelected, setCustomerDataSelected] = useState<any | null>(null);
+    const [organizations, setOrganizations] = useState<Organization[]>([]);
+    const [userDataSelected, setUserDataSelected] = useState<any | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const AuthContext = useAuth();
 
@@ -20,23 +24,25 @@ const Customer = () => {
         if (!AuthContext.user) return;
         setLoading(true);
         try {
-            const organization = AuthContext.user.organization.id;
-            const response: any = await ApiService.get(`/customer?organization=${organization}`);
-            const customers = response.map((customer: any) => ({
-                id: customer.id,
-                name: `${customer.firstName} ${customer.lastName}`,
-                firstName: customer.firstName,
-                lastName: customer.lastName,
-                cpf: customer.cpf,
-                phoneNumber: customer.phoneNumber,
-                street: customer.street,
-                number: customer.number,
-                complement: customer.complement,
-                cep: customer.cep,
-                organizationName: customer.organization.name,
-                endereco: customer.street + " - " + customer.number + " " + (customer.complement ? ', ' + customer.complement : '')
+            const organizationsResponse: any = await ApiService.get(`/organization`);
+            const organizations = organizationsResponse.map((organization: Organization) => ({
+                id: organization.id,
+                name: organization.name,
+                externalCode: organization.externalCode,
             }));
-            setRows(customers);
+            setOrganizations(organizations);
+            const response: any = await ApiService.get(`/user/get-all`);
+            const users = response.map((user: User) => ({
+                id: user.id,
+                login: user.login,
+                role: user.role,
+                role_description: user.role === 'ADMIN' ? 'Administrador' : 'Usuário Comum',
+                organization: user.organization.name,
+                formattedCreationDate: user.creationDate !== null ? moment(user.creationDate).format('DD/MM/YYYY') : "",
+                active: user.active,
+                active_description: user.active === true ? 'Ativo' : 'Inativo',
+            }));
+            setRows(users);
         } catch (error) {
             console.error('Erro ao buscar dados', error);
         } finally {
@@ -56,39 +62,39 @@ const Customer = () => {
 
     const columns: GridColDef[] = [
         {
-            field: 'name',
-            headerName: 'Nome',
+            field: 'login',
+            headerName: 'Login',
             width: 250,
             editable: false,
             disableColumnMenu: true
         },
         {
-            field: 'cpf',
-            headerName: 'CPF',
-            width: 150,
+            field: 'role_description',
+            headerName: 'Função',
+            width: 200,
+            editable: false,
+            disableColumnMenu: true,
+        },
+        {
+            field: 'organization',
+            headerName: 'Organização',
+            width: 250,
             editable: false,
             disableColumnMenu: true
         },
         {
-            field: 'phoneNumber',
-            headerName: 'Telefone',
+            field: 'formattedCreationDate',
+            headerName: 'Data de Criação',
             width: 200,
             editable: false,
             disableColumnMenu: true
         },
         {
-            field: 'endereco',
-            headerName: 'Endereço',
-            width: 300,
+            field: 'active_description',
+            headerName: 'Status',
+            width: 150,
             editable: false,
             disableColumnMenu: true,
-        },
-        {
-            field: 'cep',
-            headerName: 'CEP',
-            width: 100,
-            editable: false,
-            disableColumnMenu: true
         },
     ];
 
@@ -97,16 +103,20 @@ const Customer = () => {
     };
 
     const handleAddClick = () => {
-        setCustomerDataSelected(null);
+        setUserDataSelected(null);
         setOpenModal(true);
     };
 
     const handleEditClick = () => {
         if (selectedRows.length === 1) {
-            const customerToEdit = rows.find((row) => row.id === selectedRows[0]);
+            const userToEdit = rows.find((row) => row.id === selectedRows[0]);
 
-            if (customerToEdit) {
-                setCustomerDataSelected(customerToEdit);
+            if (userToEdit) {
+                const userEditData = {
+                    ...userToEdit,
+                    organization: organizations.find(org => org.name === userToEdit.organization) || null
+                };
+                setUserDataSelected(userEditData);
                 setOpenModal(true);
             }
         }
@@ -120,15 +130,15 @@ const Customer = () => {
         if (selectedRows.length > 0) {
             try {
                 const rowsToDelete = selectedRows.map((rowId: any) => parseInt(rowId));
-                await ApiService.delete('/customer', {
+                await ApiService.delete('/user', {
                     data: rowsToDelete
                 });
 
-                toast.success("Cliente excluído com sucesso");
+                toast.success("Usuário excluído com sucesso");
                 refreshGrid();
                 setSelectedRows([]);
             } catch (error) {
-                toast.error("Erro ao excluir cliente");
+                toast.error("Erro ao excluir usuário");
             }
 
         }
@@ -139,11 +149,11 @@ const Customer = () => {
             <Box sx={{ width: '100%', marginTop: 5 }}>
                 <Container maxWidth={false}>
                     <Typography variant="h4" component="h1" gutterBottom style={{ marginTop: 25 }}>
-                        Clientes
+                        Usuários
                     </Typography>
 
                     <TopButtons
-                        buttonLabel="Novo Cliente"
+                        buttonLabel="Novo Usuário"
                         onAddClick={handleAddClick}
                         onEditClick={handleEditClick}
                         onDeleteClick={handleDeleteClick}
@@ -159,17 +169,17 @@ const Customer = () => {
                         loading={loading}
                     />
 
-                    <CustomerModal
+                    <UserModal
                         open={openModal}
                         handleClose={handleCloseModal}
                         rows={rows}
-                        customerDataSelected={customerDataSelected}
+                        organizationList={organizations}
+                        userDataSelected={userDataSelected}
                         onSuccess={refreshGrid}
                     />
+
                 </Container>
             </Box>
         </>
     );
 }
-
-export default Customer;

@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import Header from "../../util/components/header/Header";
 import { Box, Container, Typography, Button, Dialog, DialogTitle, DialogContent, DialogActions, Divider, Slide, Fade } from '@mui/material';
 import { TransitionProps } from '@mui/material/transitions';
 import { Calendar, momentLocalizer, Formats, Messages } from 'react-big-calendar';
@@ -13,12 +12,20 @@ moment.locale('pt-br');
 const localizer = momentLocalizer(moment);
 
 const mockData = [
-    { id: 1, title: 'Visita - João Silva', subject: 'Visita',  customer: 'João Silva', start: new Date(2024, 7, 10, 14, 0), end: new Date(2024, 7, 10, 16, 0), technician: 'Rainer', address: 'Rua Eugênio Moreira, 547. Apartamento 303', status: 'Agendada' },
+    { id: 1, title: 'Visita - João Silva', subject: 'Visita', customer: 'João Silva', start: new Date(2024, 7, 10, 14, 0), end: new Date(2024, 7, 10, 16, 0), technician: 'Rainer', address: 'Rua Eugênio Moreira, 547. Apartamento 303', status: 'Agendada' },
     { id: 2, title: 'Visita - Maria Silva', subject: 'Visita', customer: 'Maria Silva', start: new Date(2024, 8, 5, 9, 0), end: new Date(2024, 8, 5, 11, 0), technician: 'Edson', address: 'Rua B, 456', status: 'Atendida' },
     { id: 3, title: 'Instalação - Edilson cardoso', subject: 'Instalação', customer: 'Edilson cardoso', start: new Date(2024, 8, 12, 9, 0), end: new Date(2024, 8, 12, 11, 0), technician: 'Edson', address: 'Rua B, 456', status: 'Agendada' },
     { id: 4, title: 'Limpeza -Edilson cardoso', subject: 'Limpeza', customer: 'Edilson cardoso', start: new Date(2024, 8, 16, 10, 0), end: new Date(2024, 8, 16, 12, 0), technician: 'Vandi', address: 'Rua C, 789', status: 'Agendada' },
     { id: 5, title: 'Visita - Lucas Costa', subject: 'Visita', customer: 'Lucas Costa', start: new Date(2024, 8, 3, 10, 0), end: new Date(2024, 8, 3, 12, 0), technician: 'José', address: 'Rua D, 999', status: 'Não Atendida' },
     { id: 6, title: 'Visita - Lucas Costa', subject: 'Visita', customer: 'Lucas Costa', start: new Date(2024, 8, 3, 10, 0), end: new Date(2024, 8, 3, 12, 0), technician: 'José', address: 'Rua D, 999', status: 'Não Atendida' },
+    { id: 7, title: 'Visita - Lucas Costa', subject: 'Visita', customer: 'Lucas Costa', start: new Date(2024, 8, 2, 10, 0), end: new Date(2024, 8, 2, 12, 0), technician: 'José', address: 'Rua D, 999', status: 'Não Atendida' },
+    { id: 7, title: 'Visita - Lucas Costa', subject: 'Visita', customer: 'Lucas Costa', start: new Date(2024, 8, 2, 10, 0), end: new Date(2024, 8, 2, 12, 0), technician: 'José', address: 'Rua D, 999', status: 'Não Atendida' },
+    { id: 7, title: 'Visita - Lucas Costa', subject: 'Visita', customer: 'Lucas Costa', start: new Date(2024, 8, 2, 10, 0), end: new Date(2024, 8, 2, 12, 0), technician: 'José', address: 'Rua D, 999', status: 'Não Atendida' },
+    { id: 7, title: 'Visita - Lucas Costa', subject: 'Visita', customer: 'Lucas Costa', start: new Date(2024, 8, 2, 10, 0), end: new Date(2024, 8, 2, 12, 0), technician: 'José', address: 'Rua D, 999', status: 'Não Atendida' },
+    { id: 7, title: 'Visita - Lucas Costa', subject: 'Visita', customer: 'Lucas Costa', start: new Date(2024, 8, 2, 10, 0), end: new Date(2024, 8, 2, 12, 0), technician: 'José', address: 'Rua D, 999', status: 'Não Atendida' },
+    { id: 7, title: 'Visita - Lucas Costa', subject: 'Visita', customer: 'Lucas Costa', start: new Date(2024, 8, 2, 10, 0), end: new Date(2024, 8, 2, 12, 0), technician: 'José', address: 'Rua D, 999', status: 'Não Atendida' },
+    { id: 7, title: 'Visita - Lucas Costa', subject: 'Visita', customer: 'Lucas Costa', start: new Date(2024, 8, 2, 10, 0), end: new Date(2024, 8, 2, 12, 0), technician: 'José', address: 'Rua D, 999', status: 'Não Atendida' },
+    { id: 7, title: 'Visita - Lucas Costa', subject: 'Visita', customer: 'Lucas Costa', start: new Date(2024, 8, 2, 10, 0), end: new Date(2024, 8, 2, 12, 0), technician: 'José', address: 'Rua D, 999', status: 'Não Atendida' },
     { id: 7, title: 'Visita - Lucas Costa', subject: 'Visita', customer: 'Lucas Costa', start: new Date(2024, 8, 2, 10, 0), end: new Date(2024, 8, 2, 12, 0), technician: 'José', address: 'Rua D, 999', status: 'Não Atendida' },
 ];
 
@@ -89,7 +96,6 @@ const Home: React.FC = () => {
 
     return (
         <>
-            <Header />
             <Box sx={{ width: '100%', marginTop: 5 }}>
                 <Container maxWidth={false}>
                     <Typography variant="h4" component="h1" gutterBottom sx={{ mb: 4 }}>

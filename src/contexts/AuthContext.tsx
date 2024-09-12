@@ -49,7 +49,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setToken(null);
         localStorage.removeItem("user");
         localStorage.removeItem("token");
-        navigate("/security/login");
+        navigate("/");
     };
 
     const isAuthenticated = !!user;

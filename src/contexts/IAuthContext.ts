@@ -13,4 +13,5 @@ export interface User {
     login: string;
     role: string;
     organization: Organization;
+    isActive: boolean;
 }

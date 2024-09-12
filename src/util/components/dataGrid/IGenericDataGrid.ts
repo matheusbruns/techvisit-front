@@ -5,4 +5,5 @@ export interface GenericDataGridProps {
     columns: GridColDef[];
     onRowSelectionChange: (newSelection: GridRowSelectionModel) => void;
     pageSizeOptions: number[];
+    loading: boolean;
 }

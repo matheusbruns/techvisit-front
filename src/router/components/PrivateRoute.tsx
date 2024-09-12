@@ -28,7 +28,7 @@ export const PrivateRoute: React.FC<{ children: JSX.Element }> = ({ children }) 
     const isAdminAndAdminRoutes = isAdmin && ADMIN_ROUTES.includes(childPath);
 
     if (!islogged) {
-        return <Navigate to="/security/login" />;
+        return <Navigate to="/" />;
     }
 
     if (isAdminAndAdminRoutes) {
@@ -42,4 +42,4 @@ export const PrivateRoute: React.FC<{ children: JSX.Element }> = ({ children }) 
     return children;
 };
 
-const ADMIN_ROUTES = ["/organization", "/users"];
+const ADMIN_ROUTES = ["/admin/organization", "/admin/users"];

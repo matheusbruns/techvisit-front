@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Container, Typography, Box, Button } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface NotFoundProps {
     statusCode: string;
@@ -10,6 +11,28 @@ interface NotFoundProps {
 
 const NotFound: React.FC<NotFoundProps> = ({ statusCode, primaryMessage, secondaryMessage }) => {
     const navigate = useNavigate();
+
+    const { setUser, setToken } = useAuth();
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            setToken(token);
+        }
+
+        const user = localStorage.getItem('user');
+        if (user) {
+            setUser(JSON.parse(user))
+        }
+
+    }, []);
+
+    const token = localStorage.getItem("token");
+    const isLogged = !!token;
+
+    if (!isLogged) {
+        return <Navigate to="/" />;
+    }
 
     const handleGoBack = () => {
         navigate('/');

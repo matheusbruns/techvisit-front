@@ -8,15 +8,8 @@ export interface Technician {
     login: string;
     password?: string;
     confirmPassword?: string;
+    active?: boolean;
     organization?: any;
-}
-
-export interface TechnicianModalProps {
-    open: boolean;
-    handleClose: () => void;
-    rows: any[];
-    technicianDataSelected?: any;
-    onSuccess?: () => void;
 }
 
 export const initialTechnicianData: Technician = {
@@ -27,4 +20,14 @@ export const initialTechnicianData: Technician = {
     login: '',
     password: '',
     confirmPassword: '',
+    active: true,
 };
+
+export interface TechnicianModalProps {
+    open: boolean;
+    handleClose: () => void;
+    rows: any[];
+    technicianDataSelected?: any;
+    onSuccess?: () => void;
+}
+

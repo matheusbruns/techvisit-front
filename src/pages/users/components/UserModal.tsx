@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Box, TextField, Button, Typography, Grid, MenuItem, FormControlLabel, Checkbox, InputAdornment, IconButton } from '@mui/material';
+import { Modal, Box, TextField, Button, Typography, Grid, MenuItem, FormControlLabel, Checkbox, InputAdornment, IconButton, Switch } from '@mui/material';
 import { toast } from 'react-toastify';
 import { initialUserData, User, UserRole } from '../IUser';
 import { Organization } from '../../../contexts/IAuthContext';
@@ -191,7 +191,7 @@ const UserModal: React.FC<UserModalProps> = ({ open, handleClose, rows, organiza
                         <TextField
                             select
                             fullWidth
-                            label="Organização"
+                            label="Empresa"
                             name="organization"
                             value={userData.organization?.id || ''}
                             onChange={handleOrganizationChange}
@@ -206,13 +206,13 @@ const UserModal: React.FC<UserModalProps> = ({ open, handleClose, rows, organiza
                             ))}
                         </TextField>
                     </Grid>
-                    <Grid item xs={6}>
+                    <Grid item xs={12}>
+
                         <FormControlLabel
                             control={
-                                <Checkbox
+                                <Switch
                                     checked={userData.active}
                                     onChange={(e) => setUserData({ ...userData, active: e.target.checked })}
-                                    name="isActive"
                                     color="primary"
                                 />
                             }

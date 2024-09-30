@@ -41,21 +41,15 @@ class ApiService {
     private handleError(error: AxiosError<ErrorResponse>) {
         if (error.response) {
             const status = error.response.status;
-            const message = error.response.data.message || 'Ocorreu um erro no servidor';
 
-            if (status === 403 || 401) {
+            if (status === 403 || status === 401) {
                 toast.error('Sessão expirada. Você será redirecionado para o login.');
                 localStorage.removeItem("user");
                 localStorage.removeItem("token");
                 window.location.reload();
-            } else {
-                toast.error(message);
             }
-        } else if (error.request) {
-            toast.error('Sem resposta do servidor. Verifique sua conexão.');
-        } else {
-            toast.error('Erro na requisição. Tente novamente.');
         }
+
         return Promise.reject(error);
     }
 

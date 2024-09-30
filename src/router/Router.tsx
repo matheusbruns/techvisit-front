@@ -9,6 +9,7 @@ import { Organization } from "../pages/organization/Organization";
 import { Users } from "../pages/users/Users";
 import Header from "../util/components/header/Header";
 import NotFound from "../pages/notFound/NotFound";
+import { Technician } from "../pages/technicians/Technician";
 
 function Router() {
     const location = useLocation();
@@ -22,7 +23,7 @@ function Router() {
                 <Route path="/" element={<PublicRoute><Login /></PublicRoute>} />
                 <Route path="/techvisit/home" element={<PrivateRoute><Home /></PrivateRoute>} />
                 <Route path="/techvisit/customer" element={<PrivateRoute><Customer /></PrivateRoute>} />
-                <Route path="/techvisit/technician" element={<PrivateRoute><h1>technician</h1></PrivateRoute>} />
+                <Route path="/techvisit/technician" element={<PrivateRoute><Technician /></PrivateRoute>} />
 
                 <Route path="/admin/organization" element={<PrivateRoute><Organization /></PrivateRoute>} />
                 <Route path="/admin/users" element={<PrivateRoute><Users /></PrivateRoute>} />

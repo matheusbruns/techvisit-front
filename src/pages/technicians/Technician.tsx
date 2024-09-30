@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Container, Typography } from '@mui/material';
-import { GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 import TopButtons from '../../util/components/topButtons/TopButtons';
 import GenericDataGrid from '../../util/components/dataGrid/GenericDataGrid';
-import CustomerModal from './components/CustomerModal';
+import { GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 import ApiService from '../../conection/api';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-toastify';
+import TechnicianModal from './components/TechnicianModal';
 
-const Customer = () => {
+export function Technician() {
     const [selectedRows, setSelectedRows] = useState<GridRowSelectionModel>([]);
     const [openModal, setOpenModal] = useState(false);
     const [rows, setRows] = useState<any[]>([]);
-    const [customerDataSelected, setCustomerDataSelected] = useState<any | null>(null);
+    const [technicianDataSelected, setTechnicianDataSelected] = useState<any | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const AuthContext = useAuth();
 
@@ -21,20 +21,15 @@ const Customer = () => {
         setLoading(true);
         try {
             const organization = AuthContext.user.organization.id;
-            const response: any = await ApiService.get(`/customer?organization=${organization}`);
+            const response: any = await ApiService.get(`/technician/get-all?organization=${organization}`);
             const customers = response.map((customer: any) => ({
                 id: customer.id,
-                name: `${customer.firstName} ${customer.lastName}`,
-                firstName: customer.firstName,
-                lastName: customer.lastName,
+                name: customer.name,
+                login: customer.login,
                 cpf: customer.cpf,
+                email: customer.email,
                 phoneNumber: customer.phoneNumber,
-                street: customer.street,
-                number: customer.number,
-                complement: customer.complement,
-                cep: customer.cep,
-                organizationName: customer.organization.name,
-                endereco: customer.street + " - " + customer.number + " " + (customer.complement ? ', ' + customer.complement : '')
+                active: customer.active,
             }));
             setRows(customers);
         } catch (error) {
@@ -63,30 +58,30 @@ const Customer = () => {
             disableColumnMenu: true
         },
         {
-            field: 'cpf',
-            headerName: 'CPF',
-            width: 250,
-            editable: false,
-            disableColumnMenu: true
-        },
-        {
-            field: 'phoneNumber',
-            headerName: 'Telefone',
+            field: 'login',
+            headerName: 'login',
             width: 200,
             editable: false,
             disableColumnMenu: true
         },
         {
-            field: 'endereco',
-            headerName: 'Endereço',
-            width: 350,
+            field: 'cpf',
+            headerName: 'cpf',
+            width: 200,
+            editable: false,
+            disableColumnMenu: true
+        },
+        {
+            field: 'email',
+            headerName: 'email',
+            width: 200,
             editable: false,
             disableColumnMenu: true,
         },
         {
-            field: 'cep',
-            headerName: 'CEP',
-            width: 120,
+            field: 'phoneNumber',
+            headerName: 'Telefone',
+            width: 250,
             editable: false,
             disableColumnMenu: true
         },
@@ -97,16 +92,19 @@ const Customer = () => {
     };
 
     const handleAddClick = () => {
-        setCustomerDataSelected(null);
+        setTechnicianDataSelected(null);
         setOpenModal(true);
     };
 
     const handleEditClick = () => {
         if (selectedRows.length === 1) {
-            const customerToEdit = rows.find((row) => row.id === selectedRows[0]);
+            const technicianToEdit = rows.find((row) => row.id === selectedRows[0]);
 
-            if (customerToEdit) {
-                setCustomerDataSelected(customerToEdit);
+            if (technicianToEdit) {
+                const technicianEditData = {
+                    ...technicianToEdit,
+                };
+                setTechnicianDataSelected(technicianEditData);
                 setOpenModal(true);
             }
         }
@@ -120,15 +118,15 @@ const Customer = () => {
         if (selectedRows.length > 0) {
             try {
                 const rowsToDelete = selectedRows.map((rowId: any) => parseInt(rowId));
-                await ApiService.delete('/customer', {
+                await ApiService.delete('/technician', {
                     data: rowsToDelete
                 });
 
-                toast.success("Cliente excluído com sucesso");
+                toast.success("Técnico excluído com sucesso");
                 refreshGrid();
                 setSelectedRows([]);
             } catch (error) {
-                toast.error("Erro ao excluir cliente");
+                toast.error("Erro ao excluir Técnico");
             }
 
         }
@@ -139,16 +137,16 @@ const Customer = () => {
             <Box sx={{ width: '100%', marginTop: 5 }}>
                 <Container maxWidth={false}>
                     <Typography variant="h4" component="h1" gutterBottom style={{ marginTop: 25 }}>
-                        Clientes
+                        Técnicos
                     </Typography>
 
                     <TopButtons
-                        buttonLabel="Novo Cliente"
+                        buttonLabel="Novo Técnico"
                         onAddClick={handleAddClick}
                         onEditClick={handleEditClick}
                         onDeleteClick={handleDeleteClick}
                         isEditDisabled={selectedRows.length !== 1}
-                        isDeleteDisabled={selectedRows.length === 0}
+                        isDeleteDisabled={true}
                     />
 
                     <GenericDataGrid
@@ -159,17 +157,16 @@ const Customer = () => {
                         loading={loading}
                     />
 
-                    <CustomerModal
+                    <TechnicianModal
                         open={openModal}
                         handleClose={handleCloseModal}
                         rows={rows}
-                        customerDataSelected={customerDataSelected}
+                        technicianDataSelected={technicianDataSelected}
                         onSuccess={refreshGrid}
                     />
+
                 </Container>
             </Box>
         </>
     );
 }
-
-export default Customer;

@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import Logo from '../../resources/images/logo.png';
 import illustration from '../../resources/images/login-illustration.png';
 import './Login.scss';
-import { useNavigate } from 'react-router-dom';
-import { TextField, Button, Checkbox, FormControlLabel, CircularProgress, Typography, Box, Container, Grid, createTheme, ThemeProvider } from '@mui/material';
+import { TextField, Button, Checkbox, FormControlLabel, CircularProgress, Typography, Box, Container, Grid, createTheme, ThemeProvider, IconButton, InputAdornment } from '@mui/material';
 import { useAuth } from '../../contexts/AuthContext';
 import ApiService from '../../conection/api';
 import { LoginResponse } from './ILogin';
 import { toast } from 'react-toastify';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 const theme = createTheme({
     components: {
@@ -46,6 +46,7 @@ export function Login() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
     const { authlogin } = useAuth();
 
     const handleLogin = async (event: React.FormEvent) => {
@@ -65,6 +66,13 @@ export function Login() {
         }
     };
 
+    const handleClickShowPassword = () => {
+        setShowPassword(!showPassword);
+    };
+
+    const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+    };
 
     return (
         <Grid container className="login-page">
@@ -99,11 +107,24 @@ export function Login() {
                                 fullWidth
                                 variant="outlined"
                                 label="Senha"
-                                type="password"
+                                type={showPassword ? 'text' : 'password'} // Alterna entre texto e senha
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
                                 margin="normal"
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                onClick={handleClickShowPassword}
+                                                onMouseDown={handleMouseDownPassword}
+                                                edge="end"
+                                            >
+                                                {showPassword ? <VisibilityOff /> : <Visibility />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    ),
+                                }}
                             />
                             <FormControlLabel
                                 control={<Checkbox id="remember" />}

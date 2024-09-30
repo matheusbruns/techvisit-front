@@ -29,6 +29,7 @@ export function Technician() {
                 cpf: customer.cpf,
                 email: customer.email,
                 phoneNumber: customer.phoneNumber,
+                active: customer.active,
             }));
             setRows(customers);
         } catch (error) {
@@ -145,7 +146,7 @@ export function Technician() {
                         onEditClick={handleEditClick}
                         onDeleteClick={handleDeleteClick}
                         isEditDisabled={selectedRows.length !== 1}
-                        isDeleteDisabled={selectedRows.length === 0}
+                        isDeleteDisabled={true}
                     />
 
                     <GenericDataGrid

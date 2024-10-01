@@ -3,16 +3,17 @@ import { Box, Container, Typography } from '@mui/material';
 import { GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 import TopButtons from '../../util/components/topButtons/TopButtons';
 import GenericDataGrid from '../../util/components/dataGrid/GenericDataGrid';
-import CustomerModal from './components/CustomerModal';
 import ApiService from '../../conection/api';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-toastify';
+import VisitScheduleModal from './components/VisitScheduleModal';
+import { VisitScheduleData } from './IVisitSchedule';
 
-const Customer = () => {
+const VisitSchedule = () => {
     const [selectedRows, setSelectedRows] = useState<GridRowSelectionModel>([]);
     const [openModal, setOpenModal] = useState(false);
     const [rows, setRows] = useState<any[]>([]);
-    const [customerDataSelected, setCustomerDataSelected] = useState<any | null>(null);
+    const [visitScheduleDataSelected, setVisitScheduleDataSelected] = useState<VisitScheduleData | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const AuthContext = useAuth();
 
@@ -21,25 +22,12 @@ const Customer = () => {
         setLoading(true);
         try {
             const organization = AuthContext.user.organization.id;
-            const response: any = await ApiService.get(`/customer?organization=${organization}`);
-            const customers = response.map((customer: any) => ({
-                id: customer.id,
-                name: `${customer.firstName} ${customer.lastName}`,
-                firstName: customer.firstName,
-                lastName: customer.lastName,
-                cpf: customer.cpf,
-                phoneNumber: customer.phoneNumber,
-                street: customer.street,
-                number: customer.number,
-                complement: customer.complement,
-                cep: customer.cep,
-                organizationName: customer.organization.name,
-                endereco: customer.street + " - " + customer.number + " " + (customer.complement ? ', ' + customer.complement : ''),
-                state: customer.state,
-                city: customer.city,
-                neighborhood: customer.neighborhood,
+            const response: any = await ApiService.get(`/visit-schedule?organization=${organization}`);
+            const schedules = response.map((schedule: VisitScheduleData) => ({
+                id: schedule.id,
+                description: schedule.description,
             }));
-            setRows(customers);
+            setRows(schedules);
         } catch (error) {
             console.error('Erro ao buscar dados', error);
         } finally {
@@ -100,16 +88,16 @@ const Customer = () => {
     };
 
     const handleAddClick = () => {
-        setCustomerDataSelected(null);
+        setVisitScheduleDataSelected(null);
         setOpenModal(true);
     };
 
     const handleEditClick = () => {
         if (selectedRows.length === 1) {
-            const customerToEdit = rows.find((row) => row.id === selectedRows[0]);
+            const scheduleToEdit = rows.find((row) => row.id === selectedRows[0]);
 
-            if (customerToEdit) {
-                setCustomerDataSelected(customerToEdit);
+            if (scheduleToEdit) {
+                setVisitScheduleDataSelected(scheduleToEdit);
                 setOpenModal(true);
             }
         }
@@ -123,15 +111,15 @@ const Customer = () => {
         if (selectedRows.length > 0) {
             try {
                 const rowsToDelete = selectedRows.map((rowId: any) => parseInt(rowId));
-                await ApiService.delete('/customer', {
+                await ApiService.delete('/visit-schedule', {
                     data: rowsToDelete
                 });
 
-                toast.success("Cliente excluído com sucesso");
+                toast.success("Agendamento excluído com sucesso");
                 refreshGrid();
                 setSelectedRows([]);
             } catch (error) {
-                toast.error("Erro ao excluir cliente");
+                toast.error("Erro ao excluir agendamento");
             }
 
         }
@@ -142,11 +130,11 @@ const Customer = () => {
             <Box sx={{ width: '100%', marginTop: 5 }}>
                 <Container maxWidth={false}>
                     <Typography variant="h4" component="h1" gutterBottom style={{ marginTop: 25 }}>
-                        Clientes
+                        Agendamentos
                     </Typography>
 
                     <TopButtons
-                        buttonLabel="Novo Cliente"
+                        buttonLabel="Novo Agendamento"
                         onAddClick={handleAddClick}
                         onEditClick={handleEditClick}
                         onDeleteClick={handleDeleteClick}
@@ -162,11 +150,11 @@ const Customer = () => {
                         loading={loading}
                     />
 
-                    <CustomerModal
+                    <VisitScheduleModal
                         open={openModal}
                         handleClose={handleCloseModal}
                         rows={rows}
-                        customerDataSelected={customerDataSelected}
+                        visitDataSelected={visitScheduleDataSelected}
                         onSuccess={refreshGrid}
                     />
                 </Container>
@@ -175,4 +163,4 @@ const Customer = () => {
     );
 }
 
-export default Customer;
+export default VisitSchedule;

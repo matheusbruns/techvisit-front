@@ -40,6 +40,9 @@ const CustomerModal: React.FC<CustomerModalProps> = ({ open, handleClose, rows, 
         number: false,
         complement: false,
         cep: false,
+        city: false,
+        state: false,
+        neighborhood: false,
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -82,6 +85,9 @@ const CustomerModal: React.FC<CustomerModalProps> = ({ open, handleClose, rows, 
             number: !customerData.number,
             complement: false,
             cep: !customerData.cep || !/^\d{5}-\d{3}$/.test(customerData.cep),
+            city: !customerData.city,
+            state: !customerData.state,
+            neighborhood: !customerData.neighborhood,
         };
 
         setErrors(newErrors);
@@ -100,7 +106,6 @@ const CustomerModal: React.FC<CustomerModalProps> = ({ open, handleClose, rows, 
                 const organization = AuthContext.user.organization;
                 customerData.organization = organization;
                 const response: any = await ApiService.post('/customer', customerData);
-
                 toast.success("Cliente salvo com sucesso!");
 
                 if (onSuccess) {
@@ -126,6 +131,9 @@ const CustomerModal: React.FC<CustomerModalProps> = ({ open, handleClose, rows, 
             number: false,
             complement: false,
             cep: false,
+            city: false,
+            state: false,
+            neighborhood: false,
         });
         handleClose();
     };
@@ -204,6 +212,48 @@ const CustomerModal: React.FC<CustomerModalProps> = ({ open, handleClose, rows, 
                             required
                             error={errors.phoneNumber}
                             helperText={errors.phoneNumber ? 'Número de telefone inválido' : ''}
+                            autoComplete="off"
+                        />
+                    </Grid>
+                    <Grid item xs={6}>
+                        <TextField
+                            fullWidth
+                            margin="normal"
+                            label="Cidade"
+                            name="city"
+                            value={customerData.city}
+                            onChange={handleChange}
+                            required
+                            error={errors.city}
+                            helperText={errors.city ? 'Campo obrigatório' : ''}
+                            autoComplete="off"
+                        />
+                    </Grid>
+                    <Grid item xs={6}>
+                        <TextField
+                            fullWidth
+                            margin="normal"
+                            label="Bairro"
+                            name="neighborhood"
+                            value={customerData.neighborhood}
+                            onChange={handleChange}
+                            required
+                            error={errors.neighborhood}
+                            helperText={errors.neighborhood ? 'Campo obrigatório' : ''}
+                            autoComplete="off"
+                        />
+                    </Grid>
+                    <Grid item xs={6}>
+                        <TextField
+                            fullWidth
+                            margin="normal"
+                            label="Estado"
+                            name="state"
+                            value={customerData.state}
+                            onChange={handleChange}
+                            required
+                            error={errors.state}
+                            helperText={errors.state ? 'Campo obrigatório' : ''}
                             autoComplete="off"
                         />
                     </Grid>

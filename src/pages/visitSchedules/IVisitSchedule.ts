@@ -13,12 +13,14 @@ export interface VisitScheduleData {
     number: string;
     complement: string | null;
     cep: string;
-    price: number | null;
+    price: string | null;
     comment: string;
     organization: Organization;
     technician: Technician;
-    endDateTime: string | undefined;
-    startDateTime: string | undefined;
+    startDateTime: Date | null;
+    endDateTime: Date | null;
+    startDate: Date | null;
+    endDate: Date | null;
 }
 
 export const initialVisitScheduleData: VisitScheduleData = {
@@ -31,10 +33,12 @@ export const initialVisitScheduleData: VisitScheduleData = {
     number: '',
     complement: '',
     cep: '',
-    price: null,
+    price:  '',
     comment: '',
-    endDateTime: '',
-    startDateTime: '',
+    endDateTime: null,
+    startDateTime: null,
+    startDate: null,
+    endDate: null,
     customer: initialCustomerData,
     technician: initialTechnicianData,
     organization: initialOrganizationData,

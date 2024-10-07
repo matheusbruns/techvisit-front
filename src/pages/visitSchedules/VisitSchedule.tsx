@@ -26,10 +26,19 @@ const VisitSchedule = () => {
             const schedules = response.map((schedule: VisitScheduleData) => ({
                 id: schedule.id,
                 description: schedule.description,
+                customerName: `${schedule.customer.firstName} ${schedule.customer.lastName}`,
+                phoneNumber: schedule.customer.phoneNumber,
+                technicianName: schedule.technician.name,
+                address: `${schedule.street}, ${schedule.number}${schedule.complement ? ', ' + schedule.complement : ''}, ${schedule.neighborhood}, ${schedule.city} - ${schedule.state}`,
+                cep: schedule.cep,
+                startDateTime: schedule.startDate,
+                endDateTime: schedule.endDate,
+                price: schedule.price,
             }));
             setRows(schedules);
         } catch (error) {
             console.error('Erro ao buscar dados', error);
+            toast.error('Erro ao buscar dados');
         } finally {
             setLoading(false);
         }
@@ -47,39 +56,72 @@ const VisitSchedule = () => {
 
     const columns: GridColDef[] = [
         {
-            field: 'name',
-            headerName: 'Nome',
-            width: 250,
+            field: 'description',
+            headerName: 'Descrição',
+            width: 200,
             editable: false,
-            disableColumnMenu: true
+            disableColumnMenu: true,
         },
         {
-            field: 'cpf',
-            headerName: 'CPF',
-            width: 250,
+            field: 'customerName',
+            headerName: 'Cliente',
+            width: 200,
             editable: false,
-            disableColumnMenu: true
+            disableColumnMenu: true,
         },
         {
             field: 'phoneNumber',
             headerName: 'Telefone',
-            width: 200,
+            width: 150,
             editable: false,
-            disableColumnMenu: true
+            disableColumnMenu: true,
         },
         {
-            field: 'endereco',
+            field: 'technicianName',
+            headerName: 'Técnico',
+            width: 200,
+            editable: false,
+            disableColumnMenu: true,
+        },
+        {
+            field: 'address',
             headerName: 'Endereço',
-            width: 350,
+            width: 300,
             editable: false,
             disableColumnMenu: true,
         },
         {
             field: 'cep',
             headerName: 'CEP',
-            width: 120,
+            width: 100,
             editable: false,
-            disableColumnMenu: true
+            disableColumnMenu: true,
+        },
+        {
+            field: 'startDateTime',
+            headerName: 'Início',
+            width: 180,
+            editable: false,
+            disableColumnMenu: true,
+            valueFormatter: (params) => {
+                if (params) {
+                    return new Date(params).toLocaleString('pt-BR');
+                }
+                return '';
+            },
+        },
+        {
+            field: 'price',
+            headerName: 'Preço',
+            width: 100,
+            editable: false,
+            disableColumnMenu: true,
+            valueFormatter: (params) => {
+                if (params) {
+                    return `R$ ${Number(params).toFixed(2)}`;
+                }
+                return '';
+            },
         },
     ];
 
@@ -112,16 +154,15 @@ const VisitSchedule = () => {
             try {
                 const rowsToDelete = selectedRows.map((rowId: any) => parseInt(rowId));
                 await ApiService.delete('/visit-schedule', {
-                    data: rowsToDelete
+                    data: rowsToDelete,
                 });
 
-                toast.success("Agendamento excluído com sucesso");
+                toast.success('Agendamento excluído com sucesso');
                 refreshGrid();
                 setSelectedRows([]);
             } catch (error) {
-                toast.error("Erro ao excluir agendamento");
+                toast.error('Erro ao excluir agendamento');
             }
-
         }
     };
 
@@ -161,6 +202,6 @@ const VisitSchedule = () => {
             </Box>
         </>
     );
-}
+};
 
 export default VisitSchedule;

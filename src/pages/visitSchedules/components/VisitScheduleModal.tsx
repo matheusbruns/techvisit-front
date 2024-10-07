@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, Box, TextField, Button, Typography, Grid, MenuItem, FormControl, InputLabel, Select, FormHelperText } from '@mui/material';
+import {
+    Modal,
+    Box,
+    TextField,
+    Button,
+    Typography,
+    Grid,
+    MenuItem,
+    InputAdornment,
+} from '@mui/material';
 import { toast } from 'react-toastify';
 import ApiService from '../../../conection/api';
 import { VisitScheduleData, initialVisitScheduleData } from '../IVisitSchedule';
@@ -20,11 +29,18 @@ interface VisitScheduleModalProps {
     onSuccess?: () => void;
 }
 
-const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({ open, handleClose, rows, visitDataSelected, onSuccess }) => {
-    const [visitData, setVisitData] = useState<VisitScheduleData>(initialVisitScheduleData);
+const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({
+    open,
+    handleClose,
+    rows,
+    visitDataSelected,
+    onSuccess,
+}) => {
+    const [visitData, setVisitData] = useState<VisitScheduleData>(
+        initialVisitScheduleData
+    );
     const [customers, setCustomers] = useState<any[]>([]);
     const [technicians, setTechnicians] = useState<any[]>([]);
-    const [priceNumber, setPriceNumber] = useState<number | null>(null);
     const [startDateTime, setStartDateTime] = useState<dayjs.Dayjs | null>(null);
     const [endDateTime, setEndDateTime] = useState<dayjs.Dayjs | null>(null);
     const AuthContext = useAuth();
@@ -35,14 +51,18 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({ open, handleClo
                 try {
                     const organizationId = AuthContext.user.organization.id;
 
-                    const customerResponse: any = await ApiService.get(`/customer?organization=${organizationId}`);
+                    const customerResponse: any = await ApiService.get(
+                        `/customer?organization=${organizationId}`
+                    );
                     const customerData = customerResponse.map((customer: any) => ({
                         id: customer.id,
                         name: `${customer.firstName} ${customer.lastName}`,
                     }));
                     setCustomers(customerData);
 
-                    const technicianResponse: any = await ApiService.get(`/technician/get-all?organization=${organizationId}`);
+                    const technicianResponse: any = await ApiService.get(
+                        `/technician/get-all?organization=${organizationId}`
+                    );
                     const technicianData = technicianResponse.map((technician: any) => ({
                         id: technician.id,
                         name: technician.name,
@@ -58,9 +78,28 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({ open, handleClo
             if (visitDataSelected) {
                 setVisitData({
                     ...visitDataSelected,
+                    price: visitDataSelected.price
+                        ? parseFloat(visitDataSelected.price)
+                            .toLocaleString('pt-BR', {
+                                style: 'currency',
+                                currency: 'BRL',
+                            })
+                        : '',
                 });
+                setStartDateTime(
+                    visitDataSelected.startDateTime
+                        ? dayjs(visitDataSelected.startDateTime)
+                        : null
+                );
+                setEndDateTime(
+                    visitDataSelected.endDateTime
+                        ? dayjs(visitDataSelected.endDateTime)
+                        : null
+                );
             } else {
                 setVisitData(initialVisitScheduleData);
+                setStartDateTime(null);
+                setEndDateTime(null);
             }
         }
     }, [open]);
@@ -81,6 +120,22 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({ open, handleClo
         endDateTime: false,
     });
 
+    const handleStartDateChange = (newValue: Dayjs | null) => {
+        setStartDateTime(newValue);
+        setVisitData((prevVisitData) => ({
+            ...prevVisitData,
+            startDateTime: newValue ? newValue.toDate() : null,
+        }));
+    };
+
+    const handleEndDateChange = (newValue: Dayjs | null) => {
+        setEndDateTime(newValue);
+        setVisitData((prevVisitData) => ({
+            ...prevVisitData,
+            endDateTime: newValue ? newValue.toDate() : null,
+        }));
+    };
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         if (name === 'cep') {
@@ -89,36 +144,36 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({ open, handleClo
                 [name]: formatCEP(value),
             });
         } else {
-
             setVisitData({
                 ...visitData,
                 [name]: value,
             });
         }
     };
-
     const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value.replace(/\D/g, '');
-
-        if (value) {
-            const numericValue = parseFloat(value) / 100;
-
-            setVisitData({
-                ...visitData,
-                price: numericValue,
-            });
-
-            setPriceNumber(numericValue);
-        } else {
-            setVisitData({
-                ...visitData,
-                price: null,
-            });
-
-            setPriceNumber(null);
-        }
+        setVisitData({
+            ...visitData,
+            price: e.target.value,
+        });
     };
 
+    const handlePriceBlur = () => {
+        const priceValue = visitData.price
+            ? parseFloat(visitData.price.replace(/[^\d.-]/g, '').replace(',', '.'))
+            : null;
+
+        if (priceValue && !isNaN(priceValue)) {
+            const formattedValue = priceValue.toLocaleString('pt-BR', {
+                style: 'currency',
+                currency: 'BRL',
+            });
+
+            setVisitData({
+                ...visitData,
+                price: formattedValue.replace('R$', '').trim(),
+            });
+        }
+    };
 
     const handleStateChange = (value: string) => {
         setVisitData({
@@ -133,6 +188,15 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({ open, handleClo
     };
 
     const validateForm = () => {
+        const priceValue = visitData.price
+            ? parseFloat(
+                visitData.price
+                    .replace(/\./g, '')
+                    .replace(',', '.')
+                    .replace(/[^\d.-]/g, '')
+            )
+            : null;
+
         const newErrors = {
             description: !visitData.description,
             city: !visitData.city,
@@ -141,7 +205,7 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({ open, handleClo
             street: !visitData.street,
             number: !visitData.number,
             cep: !visitData.cep || !/^\d{5}-\d{3}$/.test(visitData.cep),
-            price: false,
+            price: visitData.price && priceValue ? isNaN(priceValue) : false,
             comment: false,
             customer: !visitData.customer?.id,
             technician: !visitData.technician?.id,
@@ -150,46 +214,56 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({ open, handleClo
         };
 
         setErrors(newErrors);
-        return Object.values(newErrors).every(x => !x);
+        return Object.values(newErrors).every((x) => !x);
     };
 
     const handleSubmit = async () => {
-        // Verifica se as datas estão selecionadas e as converte para o formato ISO
-        const formattedStartDateTime = startDateTime ? startDateTime.toISOString() : null;
-        const formattedEndDateTime = endDateTime ? endDateTime.toISOString() : null;
-    
-        // Atualiza o objeto visitData com os valores corretos das datas
-        const updatedVisitData = {
-            ...visitData,
-            startDateTime: formattedStartDateTime,
-            endDateTime: formattedEndDateTime,
-        };
-    
         if (validateForm()) {
             try {
                 const organization = AuthContext.user.organization;
-                updatedVisitData.organization = organization;
-    
-                // Envia os dados atualizados para o backend
+                const priceValue = visitData.price
+                    ? parseFloat(
+                        visitData.price
+                            .replace(/\./g, '')
+                            .replace(',', '.')
+                            .replace(/[^\d.-]/g, '')
+                    )
+                    : null;
+
+                const updatedVisitData = {
+                    ...visitData,
+                    organization,
+                    price: priceValue,
+                    startDate: visitData.startDateTime
+                        ? visitData.startDateTime.getTime()
+                        : null,
+                    endDate: visitData.endDateTime
+                        ? visitData.endDateTime.getTime()
+                        : null,
+                };
+
                 await ApiService.post('/visit-schedule', updatedVisitData);
-    
-                toast.success("Agendamento salvo com sucesso!");
-    
+
+                toast.success('Agendamento salvo com sucesso!');
+
                 if (onSuccess) {
                     onSuccess();
                 }
-    
-                setVisitData(initialVisitScheduleData); // Reseta os dados do formulário
-                handleClose(); // Fecha o modal
+
+                setVisitData(initialVisitScheduleData);
+                setStartDateTime(null);
+                setEndDateTime(null);
+                handleClose();
             } catch (error) {
                 toast.error('Erro ao salvar agendamento');
             }
         }
     };
-    
 
     const handleCancel = () => {
         setVisitData(initialVisitScheduleData);
+        setStartDateTime(null);
+        setEndDateTime(null);
         setErrors({
             description: false,
             city: false,
@@ -225,10 +299,14 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({ open, handleClo
                     borderRadius: 2,
                 }}
             >
-                <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pt-br">
-
+                <LocalizationProvider
+                    dateAdapter={AdapterDayjs}
+                    adapterLocale="pt-br"
+                >
                     <Typography variant="h6" component="h2" gutterBottom>
-                        {visitDataSelected ? 'Editar Agendamento' : 'Cadastrar Novo Agendamento'}
+                        {visitDataSelected
+                            ? 'Editar Agendamento'
+                            : 'Cadastrar Novo Agendamento'}
                     </Typography>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
@@ -241,7 +319,9 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({ open, handleClo
                                 onChange={handleChange}
                                 required
                                 error={errors.description}
-                                helperText={errors.description ? 'Campo obrigatório' : ''}
+                                helperText={
+                                    errors.description ? 'Campo obrigatório' : ''
+                                }
                                 autoComplete="off"
                             />
                         </Grid>
@@ -252,19 +332,35 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({ open, handleClo
                                 label="Cliente"
                                 name="customer"
                                 value={visitData.customer?.id || ''}
-                                onChange={(e) => setVisitData({ ...visitData, customer: customers.find(c => c.id === e.target.value) })}
+                                onChange={(e) =>
+                                    setVisitData({
+                                        ...visitData,
+                                        customer: customers.find(
+                                            (c) => c.id === e.target.value
+                                        ),
+                                    })
+                                }
                                 required
                                 error={errors.customer}
-                                helperText={errors.customer ? 'Selecione um cliente' : ''}
+                                helperText={
+                                    errors.customer
+                                        ? 'Selecione um cliente'
+                                        : ''
+                                }
                             >
                                 {customers.length > 0 ? (
                                     customers.map((customer) => (
-                                        <MenuItem key={customer.id} value={customer.id}>
+                                        <MenuItem
+                                            key={customer.id}
+                                            value={customer.id}
+                                        >
                                             {customer.name}
                                         </MenuItem>
                                     ))
                                 ) : (
-                                    <MenuItem disabled>Nenhum cliente encontrado</MenuItem>
+                                    <MenuItem disabled>
+                                        Nenhum cliente encontrado
+                                    </MenuItem>
                                 )}
                             </TextField>
                         </Grid>
@@ -275,19 +371,35 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({ open, handleClo
                                 label="Técnico"
                                 name="technician"
                                 value={visitData.technician?.id || ''}
-                                onChange={(e) => setVisitData({ ...visitData, technician: technicians.find(t => t.id === e.target.value) })}
+                                onChange={(e) =>
+                                    setVisitData({
+                                        ...visitData,
+                                        technician: technicians.find(
+                                            (t) => t.id === e.target.value
+                                        ),
+                                    })
+                                }
                                 required
                                 error={errors.technician}
-                                helperText={errors.technician ? 'Selecione um técnico' : ''}
+                                helperText={
+                                    errors.technician
+                                        ? 'Selecione um técnico'
+                                        : ''
+                                }
                             >
                                 {technicians.length > 0 ? (
                                     technicians.map((technician) => (
-                                        <MenuItem key={technician.id} value={technician.id}>
+                                        <MenuItem
+                                            key={technician.id}
+                                            value={technician.id}
+                                        >
                                             {technician.name}
                                         </MenuItem>
                                     ))
                                 ) : (
-                                    <MenuItem disabled>Nenhum técnico encontrado</MenuItem>
+                                    <MenuItem disabled>
+                                        Nenhum técnico encontrado
+                                    </MenuItem>
                                 )}
                             </TextField>
                         </Grid>
@@ -296,7 +408,9 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({ open, handleClo
                                 value={visitData.state}
                                 onChange={handleStateChange}
                                 error={errors.state}
-                                helperText={errors.state ? 'Campo obrigatório' : ''}
+                                helperText={
+                                    errors.state ? 'Campo obrigatório' : ''
+                                }
                                 required
                                 size="small"
                             />
@@ -312,7 +426,9 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({ open, handleClo
                                 onChange={handleChange}
                                 required
                                 error={errors.city}
-                                helperText={errors.city ? 'Campo obrigatório' : ''}
+                                helperText={
+                                    errors.city ? 'Campo obrigatório' : ''
+                                }
                                 autoComplete="off"
                             />
                         </Grid>
@@ -326,7 +442,11 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({ open, handleClo
                                 onChange={handleChange}
                                 required
                                 error={errors.neighborhood}
-                                helperText={errors.neighborhood ? 'Campo obrigatório' : ''}
+                                helperText={
+                                    errors.neighborhood
+                                        ? 'Campo obrigatório'
+                                        : ''
+                                }
                                 autoComplete="off"
                             />
                         </Grid>
@@ -340,7 +460,9 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({ open, handleClo
                                 onChange={handleChange}
                                 required
                                 error={errors.street}
-                                helperText={errors.street ? 'Campo obrigatório' : ''}
+                                helperText={
+                                    errors.street ? 'Campo obrigatório' : ''
+                                }
                                 autoComplete="off"
                             />
                         </Grid>
@@ -354,7 +476,9 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({ open, handleClo
                                 onChange={handleChange}
                                 required
                                 error={errors.number}
-                                helperText={errors.number ? 'Campo obrigatório' : ''}
+                                helperText={
+                                    errors.number ? 'Campo obrigatório' : ''
+                                }
                                 autoComplete="off"
                             />
                         </Grid>
@@ -379,7 +503,9 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({ open, handleClo
                                 onChange={handleChange}
                                 required
                                 error={errors.cep}
-                                helperText={errors.cep ? 'CEP inválido' : ''}
+                                helperText={
+                                    errors.cep ? 'CEP inválido' : ''
+                                }
                                 autoComplete="off"
                             />
                         </Grid>
@@ -392,9 +518,16 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({ open, handleClo
                                 name="price"
                                 value={visitData.price ?? ''}
                                 onChange={handlePriceChange}
+                                onBlur={handlePriceBlur}
                                 error={errors.price}
                                 helperText={errors.price ? 'Preço inválido' : ''}
                                 autoComplete="off"
+                                InputProps={{
+                                    inputMode: 'decimal',
+                                    startAdornment: (
+                                        <InputAdornment position="start">R$</InputAdornment>
+                                    ),
+                                }}
                             />
                         </Grid>
 
@@ -402,11 +535,11 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({ open, handleClo
                             <DateTimePicker
                                 label="Data e Hora de Início"
                                 value={startDateTime}
-                                onChange={(newValue) => setStartDateTime(newValue)}
-                                sx={{ 
-                                    width: '100%', 
+                                onChange={handleStartDateChange}
+                                sx={{
+                                    width: '100%',
                                     '& .MuiInputBase-root': {
-                                        backgroundColor: '#f5f5f5', 
+                                        backgroundColor: '#f5f5f5',
                                         borderRadius: 2,
                                     },
                                     '& .MuiOutlinedInput-notchedOutline': {
@@ -423,7 +556,9 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({ open, handleClo
                                     textField: {
                                         fullWidth: true,
                                         error: errors.startDateTime,
-                                        helperText: errors.startDateTime ? 'Selecione a data e hora de início' : '',
+                                        helperText: errors.startDateTime
+                                            ? 'Selecione a data e hora de início'
+                                            : '',
                                     },
                                 }}
                             />
@@ -433,7 +568,7 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({ open, handleClo
                             <DateTimePicker
                                 label="Data e Hora de Fim"
                                 value={endDateTime}
-                                onChange={(newValue) => setEndDateTime(newValue)}
+                                onChange={handleEndDateChange}
                                 sx={{
                                     width: '100%',
                                     '& .MuiInputBase-root': {
@@ -454,7 +589,9 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({ open, handleClo
                                     textField: {
                                         fullWidth: true,
                                         error: errors.endDateTime,
-                                        helperText: errors.endDateTime ? 'Selecione a data e hora de fim' : '',
+                                        helperText: errors.endDateTime
+                                            ? 'Selecione a data e hora de fim'
+                                            : '',
                                     },
                                 }}
                             />
@@ -467,7 +604,7 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({ open, handleClo
                                 label="Comentários (Opcional)"
                                 name="comment"
                                 multiline
-                                rows={4}
+                                rows={2}
                                 value={visitData.comment ?? ''}
                                 onChange={handleChange}
                                 autoComplete="off"

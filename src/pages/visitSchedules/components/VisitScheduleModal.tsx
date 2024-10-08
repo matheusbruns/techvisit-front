@@ -43,6 +43,7 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({
     const [technicians, setTechnicians] = useState<any[]>([]);
     const [startDateTime, setStartDateTime] = useState<dayjs.Dayjs | null>(null);
     const [endDateTime, setEndDateTime] = useState<dayjs.Dayjs | null>(null);
+    const [displayedPrice, setDisplayedPrice] = useState<string>('');
     const AuthContext = useAuth();
 
     useEffect(() => {
@@ -57,6 +58,13 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({
                     const customerData = customerResponse.map((customer: any) => ({
                         id: customer.id,
                         name: `${customer.firstName} ${customer.lastName}`,
+                        state: customer.state,
+                        city: customer.city,
+                        neighborhood: customer.neighborhood,
+                        street: customer.street,
+                        number: customer.number,
+                        complement: customer.complement,
+                        cep: customer.cep,
                     }));
                     setCustomers(customerData);
 
@@ -78,14 +86,19 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({
             if (visitDataSelected) {
                 setVisitData({
                     ...visitDataSelected,
-                    price: visitDataSelected.price
-                        ? parseFloat(visitDataSelected.price)
-                            .toLocaleString('pt-BR', {
-                                style: 'currency',
-                                currency: 'BRL',
-                            })
-                        : '',
+                    price: visitDataSelected.price || null,
+                    id: visitDataSelected.id,
                 });
+
+                setDisplayedPrice(
+                    visitDataSelected.price
+                        ? Number(visitDataSelected.price).toLocaleString('pt-BR', {
+                            style: 'currency',
+                            currency: 'BRL',
+                        })
+                        : ''
+                );
+
                 setStartDateTime(
                     visitDataSelected.startDateTime
                         ? dayjs(visitDataSelected.startDateTime)
@@ -98,11 +111,13 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({
                 );
             } else {
                 setVisitData(initialVisitScheduleData);
+                setDisplayedPrice('');
                 setStartDateTime(null);
                 setEndDateTime(null);
             }
         }
-    }, [open]);
+    }, [open, visitDataSelected]);
+
 
     const [errors, setErrors] = useState({
         description: false,
@@ -151,27 +166,24 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({
         }
     };
     const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const inputValue = e.target.value;
+        const numericValue = parseFloat(
+            inputValue.replace(/[^\d.,-]/g, '').replace(',', '.')
+        );
         setVisitData({
             ...visitData,
-            price: e.target.value,
+            price: isNaN(numericValue) ? null : numericValue,
         });
+        setDisplayedPrice(inputValue);
     };
 
     const handlePriceBlur = () => {
-        const priceValue = visitData.price
-            ? parseFloat(visitData.price.replace(/[^\d.-]/g, '').replace(',', '.'))
-            : null;
-
-        if (priceValue && !isNaN(priceValue)) {
-            const formattedValue = priceValue.toLocaleString('pt-BR', {
+        if (visitData.price !== null && !isNaN(visitData.price)) {
+            const formattedValue = visitData.price.toLocaleString('pt-BR', {
                 style: 'currency',
                 currency: 'BRL',
             });
-
-            setVisitData({
-                ...visitData,
-                price: formattedValue.replace('R$', '').trim(),
-            });
+            setDisplayedPrice(formattedValue);
         }
     };
 
@@ -188,15 +200,6 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({
     };
 
     const validateForm = () => {
-        const priceValue = visitData.price
-            ? parseFloat(
-                visitData.price
-                    .replace(/\./g, '')
-                    .replace(',', '.')
-                    .replace(/[^\d.-]/g, '')
-            )
-            : null;
-
         const newErrors = {
             description: !visitData.description,
             city: !visitData.city,
@@ -205,12 +208,12 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({
             street: !visitData.street,
             number: !visitData.number,
             cep: !visitData.cep || !/^\d{5}-\d{3}$/.test(visitData.cep),
-            price: visitData.price && priceValue ? isNaN(priceValue) : false,
+            price: visitData.price !== null && isNaN(visitData.price),
             comment: false,
             customer: !visitData.customer?.id,
             technician: !visitData.technician?.id,
-            startDateTime: !visitData.startDateTime,
-            endDateTime: !visitData.endDateTime,
+            startDateTime: !startDateTime,
+            endDateTime: !endDateTime,
         };
 
         setErrors(newErrors);
@@ -221,30 +224,28 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({
         if (validateForm()) {
             try {
                 const organization = AuthContext.user.organization;
-                const priceValue = visitData.price
-                    ? parseFloat(
-                        visitData.price
-                            .replace(/\./g, '')
-                            .replace(',', '.')
-                            .replace(/[^\d.-]/g, '')
-                    )
+                const startDate = startDateTime
+                    ? startDateTime.valueOf()
+                    : null;
+                const endDate = endDateTime
+                    ? endDateTime.valueOf()
                     : null;
 
                 const updatedVisitData = {
                     ...visitData,
                     organization,
-                    price: priceValue,
-                    startDate: visitData.startDateTime
-                        ? visitData.startDateTime.getTime()
-                        : null,
-                    endDate: visitData.endDateTime
-                        ? visitData.endDateTime.getTime()
-                        : null,
+                    price: visitData.price,
+                    startDate,
+                    endDate,
                 };
 
-                await ApiService.post('/visit-schedule', updatedVisitData);
-
-                toast.success('Agendamento salvo com sucesso!');
+                if (visitData.id) {
+                    await ApiService.post('/visit-schedule', updatedVisitData);
+                    toast.success('Agendamento atualizado com sucesso!');
+                } else {
+                    await ApiService.post('/visit-schedule', updatedVisitData);
+                    toast.success('Agendamento salvo com sucesso!');
+                }
 
                 if (onSuccess) {
                     onSuccess();
@@ -253,8 +254,10 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({
                 setVisitData(initialVisitScheduleData);
                 setStartDateTime(null);
                 setEndDateTime(null);
+                setDisplayedPrice('');
                 handleClose();
             } catch (error) {
+                console.error('Erro ao salvar agendamento:', error);
                 toast.error('Erro ao salvar agendamento');
             }
         }
@@ -264,6 +267,7 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({
         setVisitData(initialVisitScheduleData);
         setStartDateTime(null);
         setEndDateTime(null);
+        setDisplayedPrice('');
         setErrors({
             description: false,
             city: false,
@@ -332,14 +336,23 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({
                                 label="Cliente"
                                 name="customer"
                                 value={visitData.customer?.id || ''}
-                                onChange={(e) =>
+                                onChange={(e) => {
+                                    const selectedCustomer = customers.find(
+                                        (c) => c.id === e.target.value
+                                    );
+
                                     setVisitData({
                                         ...visitData,
-                                        customer: customers.find(
-                                            (c) => c.id === e.target.value
-                                        ),
-                                    })
-                                }
+                                        customer: selectedCustomer,
+                                        state: selectedCustomer?.state || '',
+                                        city: selectedCustomer?.city || '',
+                                        neighborhood: selectedCustomer?.neighborhood || '',
+                                        street: selectedCustomer?.street || '',
+                                        number: selectedCustomer?.number || '',
+                                        complement: selectedCustomer?.complement || '',
+                                        cep: selectedCustomer?.cep || '',
+                                    });
+                                }}
                                 required
                                 error={errors.customer}
                                 helperText={
@@ -516,16 +529,22 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({
                                 margin="normal"
                                 label="Preço (Opcional)"
                                 name="price"
-                                value={visitData.price ?? ''}
+                                value={displayedPrice}
                                 onChange={handlePriceChange}
                                 onBlur={handlePriceBlur}
+                                onFocus={() => {
+                                    if (displayedPrice) {
+                                        const unformattedValue = displayedPrice.replace(/[^\d.,-]/g, '');
+                                        setDisplayedPrice(unformattedValue);
+                                    }
+                                }}
                                 error={errors.price}
                                 helperText={errors.price ? 'Preço inválido' : ''}
                                 autoComplete="off"
                                 InputProps={{
                                     inputMode: 'decimal',
                                     startAdornment: (
-                                        <InputAdornment position="start">R$</InputAdornment>
+                                        <InputAdornment position="start"></InputAdornment>
                                     ),
                                 }}
                             />

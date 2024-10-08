@@ -71,7 +71,6 @@ const StateSelect: React.FC<StateSelectProps> = ({ value, onChange, error, helpe
                     disabled={disabled}
                     margin={margin}
                     fullWidth={fullWidth}
-                    size={size}
                 />
             )}
             disableClearable

@@ -80,7 +80,6 @@ const UserModal: React.FC<UserModalProps> = ({ open, handleClose, rows, organiza
 
         try {
             const userPayload = userDataSelected ? { ...userData } : { ...userData, password };
-            console.log(userPayload);
             if (userDataSelected) {
                 await ApiService.put('/user', userPayload);
                 toast.success('Usuário atualizado com sucesso');
@@ -138,6 +137,15 @@ const UserModal: React.FC<UserModalProps> = ({ open, handleClose, rows, organiza
         setShowConfirmPassword(!showConfirmPassword);
     };
 
+    const handleRoleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const selectedRole = e.target.value;
+        if (Object.values(UserRole).includes(selectedRole as UserRole)) {
+            setUserData({ ...userData, role: selectedRole as UserRole });
+        } else {
+            console.error('Função inválida selecionada');
+        }
+    };
+
     return (
         <Modal open={open} onClose={handleClose}>
             <Box
@@ -178,7 +186,7 @@ const UserModal: React.FC<UserModalProps> = ({ open, handleClose, rows, organiza
                             label="Função"
                             name="role"
                             value={userData.role}
-                            onChange={(e) => setUserData({ ...userData, role: e.target.value as UserRole })}
+                            onChange={handleRoleChange}
                             required
                             error={errors.role}
                             helperText={errors.role ? 'Campo obrigatório' : ''}

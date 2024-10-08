@@ -13,7 +13,7 @@ export interface VisitScheduleData {
     number: string;
     complement: string | null;
     cep: string;
-    price: string | null;
+    price: number | null;
     comment: string;
     organization: Organization;
     technician: Technician;
@@ -33,7 +33,7 @@ export const initialVisitScheduleData: VisitScheduleData = {
     number: '',
     complement: '',
     cep: '',
-    price:  '',
+    price:  null,
     comment: '',
     endDateTime: null,
     startDateTime: null,

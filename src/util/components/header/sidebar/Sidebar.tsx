@@ -21,7 +21,7 @@ const Sidebar: React.FC<SidebarProps> = ({ drawerVisible, toggleDrawer }) => {
     const handleNavigation = (path: string | undefined) => {
         if (path) {
             navigate(path);
-            toggleDrawer(false)({} as React.MouseEvent); // Close drawer on navigation
+            toggleDrawer(false)({} as React.MouseEvent);
         }
     };
 

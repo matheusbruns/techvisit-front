@@ -34,6 +34,15 @@ const VisitSchedule = () => {
                 startDateTime: schedule.startDate,
                 endDateTime: schedule.endDate,
                 price: schedule.price,
+                state: schedule.state,
+                city: schedule.city,
+                neighborhood: schedule.neighborhood,
+                street: schedule.street,
+                number: schedule.number,
+                complement: schedule.complement,
+                technician: schedule.technician,
+                customer: schedule.customer,
+                comment: schedule.comment,
             }));
             setRows(schedules);
         } catch (error) {

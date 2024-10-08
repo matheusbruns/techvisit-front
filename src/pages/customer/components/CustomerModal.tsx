@@ -5,6 +5,7 @@ import ApiService from '../../../conection/api';
 import { Customer, initialCustomerData } from '../ICustomer';
 import { useAuth } from '../../../contexts/AuthContext';
 import { formatCEP, formatCPF, formatPhoneNumber, isValidCPF } from '../../../util/format/IFunctions';
+import StateSelect from '../../../util/components/select/StateSelect';
 
 interface CustomerModalProps {
     open: boolean;
@@ -18,11 +19,8 @@ const CustomerModal: React.FC<CustomerModalProps> = ({ open, handleClose, rows, 
     const [customerData, setCustomerData] = useState<Customer>(initialCustomerData);
     const AuthContext = useAuth();
 
-    console.log(customerDataSelected);
-
     useEffect(() => {
         if (customerDataSelected) {
-            console.log('customerDataSelected', customerDataSelected);
             setCustomerData({
                 ...customerDataSelected,
             });
@@ -101,7 +99,6 @@ const CustomerModal: React.FC<CustomerModalProps> = ({ open, handleClose, rows, 
 
     const handleSubmit = async () => {
         if (validateForm()) {
-            console.log('Dados do cliente enviados:', customerData);
             try {
                 const organization = AuthContext.user.organization;
                 customerData.organization = organization;
@@ -136,6 +133,18 @@ const CustomerModal: React.FC<CustomerModalProps> = ({ open, handleClose, rows, 
             neighborhood: false,
         });
         handleClose();
+    };
+
+    const handleStateChange = (value: string) => {
+        setCustomerData({
+            ...customerData,
+            state: value,
+        });
+
+        setErrors((prevErrors) => ({
+            ...prevErrors,
+            state: value === '',
+        }));
     };
 
     return (
@@ -244,17 +253,15 @@ const CustomerModal: React.FC<CustomerModalProps> = ({ open, handleClose, rows, 
                         />
                     </Grid>
                     <Grid item xs={6}>
-                        <TextField
-                            fullWidth
-                            margin="normal"
-                            label="Estado"
-                            name="state"
+                        <StateSelect
                             value={customerData.state}
-                            onChange={handleChange}
-                            required
+                            onChange={handleStateChange}
                             error={errors.state}
-                            helperText={errors.state ? 'Campo obrigatório' : ''}
-                            autoComplete="off"
+                            helperText={
+                                errors.state ? 'Campo obrigatório' : ''
+                            }
+                            required
+                            size="small"
                         />
                     </Grid>
                     <Grid item xs={6}>

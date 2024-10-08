@@ -31,3 +31,9 @@ export interface TechnicianModalProps {
     onSuccess?: () => void;
 }
 
+export interface TechnicianSelect {
+    id: number;
+    name: string;
+}
+
+

@@ -106,7 +106,6 @@ export function Organization() {
 
     const handleDeleteClick = () => {
         if (selectedRows.length > 0) {
-            console.log('Excluir clientes com IDs:', selectedRows);
         }
     };
 

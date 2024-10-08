@@ -6,6 +6,9 @@ export interface Customer {
     lastName: string;
     cpf: string;
     phoneNumber: string;
+    state: string;
+    city: string;
+    neighborhood: string;
     street: string;
     number: string;
     complement: string | null;
@@ -23,6 +26,9 @@ export const initialCustomerData: Customer = {
     lastName: '',
     cpf: '',
     phoneNumber: '',
+    state: '',
+    city: '',
+    neighborhood: '',
     street: '',
     number: '',
     complement: '',
@@ -35,3 +41,8 @@ export const initialCustomerData: Customer = {
         expirationDate: '2024-01-01'
     },
 };
+
+export interface CustomerSelect {
+    id: number;
+    name: string;
+}

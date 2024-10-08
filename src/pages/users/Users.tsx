@@ -8,7 +8,7 @@ import ApiService from '../../conection/api';
 import { useAuth } from '../../contexts/AuthContext';
 import moment from 'moment';
 import { Organization } from '../organization/IOrganization';
-import { User } from './IUser';
+import { getUserRoleDescription, User, UserRole } from './IUser';
 import { toast } from 'react-toastify';
 
 export function Users() {
@@ -36,7 +36,7 @@ export function Users() {
                 id: user.id,
                 login: user.login,
                 role: user.role,
-                role_description: user.role === 'ADMIN' ? 'Administrador' : 'Usuário Comum',
+                role_description: getUserRoleDescription(user.role),
                 organization: user.organization.name,
                 formattedCreationDate: user.creationDate !== null ? moment(user.creationDate).format('DD/MM/YYYY') : "",
                 active: user.active,

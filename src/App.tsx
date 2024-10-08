@@ -3,6 +3,7 @@ import { BrowserRouter } from 'react-router-dom';
 import "./util/styles/global.scss";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
+import React from 'react';
 
 function App() {
 	return (

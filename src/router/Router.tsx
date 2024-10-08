@@ -10,6 +10,7 @@ import { Users } from "../pages/users/Users";
 import Header from "../util/components/header/Header";
 import NotFound from "../pages/notFound/NotFound";
 import { Technician } from "../pages/technicians/Technician";
+import VisitSchedule from "../pages/visitSchedules/VisitSchedule";
 
 function Router() {
     const location = useLocation();
@@ -24,6 +25,7 @@ function Router() {
                 <Route path="/techvisit/home" element={<PrivateRoute><Home /></PrivateRoute>} />
                 <Route path="/techvisit/customer" element={<PrivateRoute><Customer /></PrivateRoute>} />
                 <Route path="/techvisit/technician" element={<PrivateRoute><Technician /></PrivateRoute>} />
+                <Route path="/techvisit/visit-schedule" element={<PrivateRoute><VisitSchedule /></PrivateRoute>} />
 
                 <Route path="/admin/organization" element={<PrivateRoute><Organization /></PrivateRoute>} />
                 <Route path="/admin/users" element={<PrivateRoute><Users /></PrivateRoute>} />

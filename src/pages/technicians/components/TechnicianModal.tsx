@@ -77,9 +77,10 @@ const TechnicianModal: React.FC<TechnicianModalProps> = ({
     };
 
     const validateForm = () => {
+
         const cpfExists = rows.some(
             (technician: any) =>
-                technician.cpf === technicianData.cpf && technician.id !== technicianData.id
+                technician.cpf === technicianData.cpf && technician.login !== technicianData.login
         );
 
         const emailExists = rows.some(
@@ -177,7 +178,6 @@ const TechnicianModal: React.FC<TechnicianModalProps> = ({
             }
         }
     };
-
 
     const handleCancel = () => {
         setTechnicianData(initialTechnicianData);

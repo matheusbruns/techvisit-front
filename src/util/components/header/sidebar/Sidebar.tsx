@@ -21,13 +21,13 @@ const Sidebar: React.FC<SidebarProps> = ({ drawerVisible, toggleDrawer }) => {
     const handleNavigation = (path: string | undefined) => {
         if (path) {
             navigate(path);
-            toggleDrawer(false)({} as React.MouseEvent); // Close drawer on navigation
+            toggleDrawer(false)({} as React.MouseEvent);
         }
     };
 
     const menuItems = [
         { text: 'Visão Geral', path: '/techvisit/home', icon: <Home /> },
-        { text: 'Agendamentos', path: '/techvisit/appointments', icon: <Assignment /> },
+        { text: 'Agendamentos', path: '/techvisit/visit-schedule', icon: <Assignment /> },
         { text: 'Clientes', path: '/techvisit/customer', icon: <GroupsIcon /> },
         { text: 'Técnicos', path: '/techvisit/technician', icon: <EngineeringIcon /> },
         user?.role === "ADMIN" ? { text: 'Empresas', path: '/admin/organization', icon: <ApartmentIcon /> } : null,

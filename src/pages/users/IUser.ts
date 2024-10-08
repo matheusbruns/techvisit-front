@@ -23,5 +23,19 @@ export const initialUserData: User = {
 export enum UserRole {
     ADMIN = 'ADMIN',
     USER = 'USER',
+    TECHNICIAN = 'TECHNICIAN',
 }
+
+export const getUserRoleDescription = (role: UserRole | string): string => {
+    switch (role) {
+        case UserRole.ADMIN:
+            return 'Usuário Administrador';
+        case UserRole.USER:
+            return 'Usuário Comum';
+        case UserRole.TECHNICIAN:
+            return 'Técnico';
+        default:
+            return 'Unknown Role';
+    }
+};
 

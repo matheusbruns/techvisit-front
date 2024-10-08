@@ -3,16 +3,17 @@ import { Box, Container, Typography } from '@mui/material';
 import { GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 import TopButtons from '../../util/components/topButtons/TopButtons';
 import GenericDataGrid from '../../util/components/dataGrid/GenericDataGrid';
-import CustomerModal from './components/CustomerModal';
 import ApiService from '../../conection/api';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-toastify';
+import VisitScheduleModal from './components/VisitScheduleModal';
+import { VisitScheduleData } from './IVisitSchedule';
 
-const Customer = () => {
+const VisitSchedule = () => {
     const [selectedRows, setSelectedRows] = useState<GridRowSelectionModel>([]);
     const [openModal, setOpenModal] = useState(false);
     const [rows, setRows] = useState<any[]>([]);
-    const [customerDataSelected, setCustomerDataSelected] = useState<any | null>(null);
+    const [visitScheduleDataSelected, setVisitScheduleDataSelected] = useState<VisitScheduleData | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const AuthContext = useAuth();
 
@@ -21,27 +22,32 @@ const Customer = () => {
         setLoading(true);
         try {
             const organization = AuthContext.user.organization.id;
-            const response: any = await ApiService.get(`/customer?organization=${organization}`);
-            const customers = response.map((customer: any) => ({
-                id: customer.id,
-                name: `${customer.firstName} ${customer.lastName}`,
-                firstName: customer.firstName,
-                lastName: customer.lastName,
-                cpf: customer.cpf,
-                phoneNumber: customer.phoneNumber,
-                street: customer.street,
-                number: customer.number,
-                complement: customer.complement,
-                cep: customer.cep,
-                organizationName: customer.organization.name,
-                endereco: customer.street + " - " + customer.number + " " + (customer.complement ? ', ' + customer.complement : ''),
-                state: customer.state,
-                city: customer.city,
-                neighborhood: customer.neighborhood,
+            const response: any = await ApiService.get(`/visit-schedule?organization=${organization}`);
+            const schedules = response.map((schedule: VisitScheduleData) => ({
+                id: schedule.id,
+                description: schedule.description,
+                customerName: `${schedule.customer.firstName} ${schedule.customer.lastName}`,
+                phoneNumber: schedule.customer.phoneNumber,
+                technicianName: schedule.technician.name,
+                address: `${schedule.street}, ${schedule.number}${schedule.complement ? ', ' + schedule.complement : ''}, ${schedule.neighborhood}, ${schedule.city} - ${schedule.state}`,
+                cep: schedule.cep,
+                startDateTime: schedule.startDate,
+                endDateTime: schedule.endDate,
+                price: schedule.price,
+                state: schedule.state,
+                city: schedule.city,
+                neighborhood: schedule.neighborhood,
+                street: schedule.street,
+                number: schedule.number,
+                complement: schedule.complement,
+                technician: schedule.technician,
+                customer: schedule.customer,
+                comment: schedule.comment,
             }));
-            setRows(customers);
+            setRows(schedules);
         } catch (error) {
             console.error('Erro ao buscar dados', error);
+            toast.error('Erro ao buscar dados');
         } finally {
             setLoading(false);
         }
@@ -59,39 +65,72 @@ const Customer = () => {
 
     const columns: GridColDef[] = [
         {
-            field: 'name',
-            headerName: 'Nome',
-            width: 250,
+            field: 'description',
+            headerName: 'Descrição',
+            width: 200,
             editable: false,
-            disableColumnMenu: true
+            disableColumnMenu: true,
         },
         {
-            field: 'cpf',
-            headerName: 'CPF',
-            width: 250,
+            field: 'customerName',
+            headerName: 'Cliente',
+            width: 200,
             editable: false,
-            disableColumnMenu: true
+            disableColumnMenu: true,
         },
         {
             field: 'phoneNumber',
             headerName: 'Telefone',
-            width: 200,
+            width: 150,
             editable: false,
-            disableColumnMenu: true
+            disableColumnMenu: true,
         },
         {
-            field: 'endereco',
+            field: 'technicianName',
+            headerName: 'Técnico',
+            width: 200,
+            editable: false,
+            disableColumnMenu: true,
+        },
+        {
+            field: 'address',
             headerName: 'Endereço',
-            width: 350,
+            width: 300,
             editable: false,
             disableColumnMenu: true,
         },
         {
             field: 'cep',
             headerName: 'CEP',
-            width: 120,
+            width: 100,
             editable: false,
-            disableColumnMenu: true
+            disableColumnMenu: true,
+        },
+        {
+            field: 'startDateTime',
+            headerName: 'Início',
+            width: 180,
+            editable: false,
+            disableColumnMenu: true,
+            valueFormatter: (params) => {
+                if (params) {
+                    return new Date(params).toLocaleString('pt-BR');
+                }
+                return '';
+            },
+        },
+        {
+            field: 'price',
+            headerName: 'Preço',
+            width: 100,
+            editable: false,
+            disableColumnMenu: true,
+            valueFormatter: (params) => {
+                if (params) {
+                    return `R$ ${Number(params).toFixed(2)}`;
+                }
+                return '';
+            },
         },
     ];
 
@@ -100,16 +139,16 @@ const Customer = () => {
     };
 
     const handleAddClick = () => {
-        setCustomerDataSelected(null);
+        setVisitScheduleDataSelected(null);
         setOpenModal(true);
     };
 
     const handleEditClick = () => {
         if (selectedRows.length === 1) {
-            const customerToEdit = rows.find((row) => row.id === selectedRows[0]);
+            const scheduleToEdit = rows.find((row) => row.id === selectedRows[0]);
 
-            if (customerToEdit) {
-                setCustomerDataSelected(customerToEdit);
+            if (scheduleToEdit) {
+                setVisitScheduleDataSelected(scheduleToEdit);
                 setOpenModal(true);
             }
         }
@@ -123,17 +162,16 @@ const Customer = () => {
         if (selectedRows.length > 0) {
             try {
                 const rowsToDelete = selectedRows.map((rowId: any) => parseInt(rowId));
-                await ApiService.delete('/customer', {
-                    data: rowsToDelete
+                await ApiService.delete('/visit-schedule', {
+                    data: rowsToDelete,
                 });
 
-                toast.success("Cliente excluído com sucesso");
+                toast.success('Agendamento excluído com sucesso');
                 refreshGrid();
                 setSelectedRows([]);
             } catch (error) {
-                toast.error("Erro ao excluir cliente");
+                toast.error('Erro ao excluir agendamento');
             }
-
         }
     };
 
@@ -142,11 +180,11 @@ const Customer = () => {
             <Box sx={{ width: '100%', marginTop: 5 }}>
                 <Container maxWidth={false}>
                     <Typography variant="h4" component="h1" gutterBottom style={{ marginTop: 25 }}>
-                        Clientes
+                        Agendamentos
                     </Typography>
 
                     <TopButtons
-                        buttonLabel="Novo Cliente"
+                        buttonLabel="Novo Agendamento"
                         onAddClick={handleAddClick}
                         onEditClick={handleEditClick}
                         onDeleteClick={handleDeleteClick}
@@ -162,17 +200,17 @@ const Customer = () => {
                         loading={loading}
                     />
 
-                    <CustomerModal
+                    <VisitScheduleModal
                         open={openModal}
                         handleClose={handleCloseModal}
                         rows={rows}
-                        customerDataSelected={customerDataSelected}
+                        visitDataSelected={visitScheduleDataSelected}
                         onSuccess={refreshGrid}
                     />
                 </Container>
             </Box>
         </>
     );
-}
+};
 
-export default Customer;
+export default VisitSchedule;

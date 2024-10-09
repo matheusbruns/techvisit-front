@@ -19,8 +19,16 @@ export interface VisitScheduleData {
     technician: Technician;
     startDateTime: Date | null;
     endDateTime: Date | null;
-    startDate: Date | null;
-    endDate: Date | null;
+    startDate: string | null;
+    endDate: string | null;
+    status: VisitScheduleStatus;
+}
+
+export enum VisitScheduleStatus {
+    SCHEDULED = 'SCHEDULED',
+    ATTENDED = 'ATTENDED',
+    NOT_ATTENDED = 'NOT_ATTENDED',
+    CANCELLED = 'CANCELLED',
 }
 
 export const initialVisitScheduleData: VisitScheduleData = {
@@ -33,7 +41,7 @@ export const initialVisitScheduleData: VisitScheduleData = {
     number: '',
     complement: '',
     cep: '',
-    price:  null,
+    price: null,
     comment: '',
     endDateTime: null,
     startDateTime: null,
@@ -42,4 +50,6 @@ export const initialVisitScheduleData: VisitScheduleData = {
     customer: initialCustomerData,
     technician: initialTechnicianData,
     organization: initialOrganizationData,
+    status: VisitScheduleStatus.SCHEDULED,
 };
+

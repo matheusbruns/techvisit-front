@@ -43,6 +43,8 @@ const VisitSchedule = () => {
                 technician: schedule.technician,
                 customer: schedule.customer,
                 comment: schedule.comment,
+                startDate: schedule.startDate,
+                startTime: schedule.startDate,
             }));
             setRows(schedules);
         } catch (error) {
@@ -67,7 +69,7 @@ const VisitSchedule = () => {
         {
             field: 'description',
             headerName: 'Descrição',
-            width: 200,
+            width: 250,
             editable: false,
             disableColumnMenu: true,
         },
@@ -95,26 +97,44 @@ const VisitSchedule = () => {
         {
             field: 'address',
             headerName: 'Endereço',
-            width: 300,
+            width: 350,
             editable: false,
             disableColumnMenu: true,
         },
         {
             field: 'cep',
             headerName: 'CEP',
-            width: 100,
+            width: 130,
             editable: false,
             disableColumnMenu: true,
         },
         {
-            field: 'startDateTime',
-            headerName: 'Início',
-            width: 180,
+            field: 'startDate',
+            headerName: 'Data',
+            width: 150,
             editable: false,
             disableColumnMenu: true,
             valueFormatter: (params) => {
                 if (params) {
-                    return new Date(params).toLocaleString('pt-BR');
+                    const date = new Date(params);
+                    return date.toLocaleDateString('pt-BR');
+                }
+                return '';
+            },
+        },
+        {
+            field: 'startTime',
+            headerName: 'Hora',
+            width: 130,
+            editable: false,
+            disableColumnMenu: true,
+            valueFormatter: (params) => {
+                if (params) {
+                    const date = new Date(params);
+                    return date.toLocaleTimeString('pt-BR', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
                 }
                 return '';
             },
@@ -122,14 +142,17 @@ const VisitSchedule = () => {
         {
             field: 'price',
             headerName: 'Preço',
-            width: 100,
+            width: 120,
             editable: false,
             disableColumnMenu: true,
             valueFormatter: (params) => {
                 if (params) {
-                    return `R$ ${Number(params).toFixed(2)}`;
+                    return new Intl.NumberFormat('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL'
+                    }).format(params);
                 }
-                return '';
+                return 'Não definido';
             },
         },
     ];

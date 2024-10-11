@@ -11,6 +11,7 @@ import Header from "../util/components/header/Header";
 import NotFound from "../pages/notFound/NotFound";
 import { Technician } from "../pages/technicians/Technician";
 import VisitSchedule from "../pages/visitSchedules/VisitSchedule";
+import MyVisits from "../pages/myVisits/MyVisits";
 
 function Router() {
     const location = useLocation();
@@ -26,10 +27,11 @@ function Router() {
                 <Route path="/techvisit/customer" element={<PrivateRoute><Customer /></PrivateRoute>} />
                 <Route path="/techvisit/technician" element={<PrivateRoute><Technician /></PrivateRoute>} />
                 <Route path="/techvisit/visit-schedule" element={<PrivateRoute><VisitSchedule /></PrivateRoute>} />
+                <Route path="/techvisit/my-visits" element={<PrivateRoute><MyVisits /></PrivateRoute>} />
 
                 <Route path="/admin/organization" element={<PrivateRoute><Organization /></PrivateRoute>} />
                 <Route path="/admin/users" element={<PrivateRoute><Users /></PrivateRoute>} />
-                
+
                 <Route path="*" element={
                     <NotFound statusCode="404"
                         primaryMessage="Oops! Página não encontrada."

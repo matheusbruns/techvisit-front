@@ -8,55 +8,138 @@ import {
     Typography,
     TextField,
     Button,
-    Divider
+    Divider,
+    Chip,
 } from '@mui/material';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-toastify';
 import ApiService from '../../conection/api';
+import { VisitScheduleData } from '../visitSchedules/IVisitSchedule';
 
 const MtVisits: React.FC = () => {
     const [visits, setVisits] = useState<any[]>([]);
     const [initialValues, setInitialValues] = useState<{ [key: number]: { price: number; comment: string } }>({});
     const AuthContext = useAuth();
 
+    const isToday = (someDate: Date) => {
+        const today = new Date();
+        return (
+            someDate.getDate() === today.getDate() &&
+            someDate.getMonth() === today.getMonth() &&
+            someDate.getFullYear() === today.getFullYear()
+        );
+    };
+
+    const isTomorrow = (someDate: Date) => {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        return (
+            someDate.getDate() === tomorrow.getDate() &&
+            someDate.getMonth() === tomorrow.getMonth() &&
+            someDate.getFullYear() === tomorrow.getFullYear()
+        );
+    };
+
+    const fetchData = async () => {
+        if (!AuthContext.user) return;
+        try {
+            const organization = AuthContext.user.organization.id;
+            const user = AuthContext.user.id;
+            const response: any = await ApiService.get(`/visit-schedule/my-visits?organization=${organization}&user=${user}`);
+            const visits = response.map((schedule: VisitScheduleData) => {
+                const startDate = new Date(schedule.startDate!);
+                return {
+                    id: schedule.id,
+                    title: `${schedule.description} - ${schedule.customer.firstName} ${schedule.customer.lastName}`,
+                    description: schedule.description,
+                    customer: `${schedule.customer.firstName} ${schedule.customer.lastName}`,
+                    start: startDate,
+                    end: new Date(schedule.endDate!),
+                    technician: schedule.technician.name,
+                    address: `${schedule.street}, ${schedule.number}${schedule.complement ? ', ' + schedule.complement : ''
+                        }, ${schedule.neighborhood}, ${schedule.city} - ${schedule.state}`,
+                    status: schedule.status,
+                    comment: schedule.comment,
+                    price: schedule.price,
+                    isToday: isToday(startDate),
+                    isTomorrow: isTomorrow(startDate),
+                };
+            });
+
+            visits.sort((a: { start: number; }, b: { start: number; }) => {
+                const getSortValue = (visit: any) => {
+                    if (visit.isToday) {
+                        return 1;
+                    } else if (visit.isTomorrow) {
+                        return 2;
+                    } else if (visit.start > new Date()) {
+                        return 3;
+                    } else {
+                        return 4;
+                    }
+                };
+
+                const sortValueA = getSortValue(a);
+                const sortValueB = getSortValue(b);
+
+                if (sortValueA !== sortValueB) {
+                    return sortValueA - sortValueB;
+                } else {
+                    return a.start - b.start;
+                }
+            });
+
+            setVisits(visits);
+            const initial = visits.reduce((
+                acc: { [x: string]: { price: any; comment: any } },
+                visit: { id: string | number; price: any; comment: any }
+            ) => {
+                acc[visit.id] = { price: visit.price, comment: visit.comment };
+                return acc;
+            },
+                {} as { [key: number]: { price: number; comment: string } }
+            );
+            setInitialValues(initial);
+        } catch (error) {
+            console.error('Erro ao buscar dados', error);
+            toast.error('Erro ao buscar dados');
+        }
+    };
+
     useEffect(() => {
-        const mockData = [
-            {
-                id: 1,
-                description: 'Instalação de Ar Condicionado',
-                customer: 'João Silva',
-                start: new Date(2024, 7, 10, 14, 0),
-                end: new Date(2024, 7, 10, 16, 0),
-                address: 'Rua Eugênio Moreira, 547, Apartamento 303',
-                status: 'Agendado',
-                price: 250.0,
-                comment: 'Cliente prefere instalação no período da tarde.',
-                technician: 'Rainer',
-            },
-            {
-                id: 2,
-                description: 'Manutenção',
-                customer: 'Maria Oliveira',
-                start: new Date(2024, 8, 5, 9, 0),
-                end: new Date(2024, 8, 5, 11, 0),
-                address: 'Rua A, 123',
-                status: 'Atendido',
-                price: 180.0,
-                comment: 'Cliente pediu para verificar vazamento.',
-                technician: 'Eduardo',
-            },
-        ];
-        setVisits(mockData);
+        if (AuthContext.user) {
+            fetchData();
+        }
+    }, [AuthContext.user]);
 
-        const initial = mockData.reduce((acc, visit) => {
-            acc[visit.id] = { price: visit.price, comment: visit.comment };
-            return acc;
-        }, {} as { [key: number]: { price: number; comment: string } });
-        setInitialValues(initial);
-    }, []);
+    const handleSave = async (id: number) => {
+        const visitToUpdate = visits.find((v) => v.id === id);
+        if (!visitToUpdate) {
+            toast.error('Visita não encontrada.');
+            return;
+        }
 
-    const handleSave = (id: number, updatedPrice: number, updatedComment: string) => {
-        toast.success('Alterações salvas com sucesso');
+        try {
+            const updatedVisitData = {
+                id: visitToUpdate.id,
+                price: visitToUpdate.price,
+                comment: visitToUpdate.comment,
+            };
+            await ApiService.put('/visit-schedule/my-visits/update', updatedVisitData);
+
+            setInitialValues((prevValues) => ({
+                ...prevValues,
+                [id]: {
+                    price: visitToUpdate.price,
+                    comment: visitToUpdate.comment,
+                },
+            }));
+
+            toast.success('Salvo com sucesso!');
+        } catch (error) {
+            console.error('Erro ao salvar', error);
+            toast.error('Erro ao salvar');
+        }
     };
 
     const handlePriceChange = (event: React.ChangeEvent<HTMLInputElement>, id: number) => {
@@ -95,14 +178,40 @@ const MtVisits: React.FC = () => {
 
     return (
         <Container sx={{ mt: 4, mb: 4 }}>
-            <Typography variant="h4" gutterBottom>
+            <Typography variant="h4" gutterBottom
+                sx={{
+                    marginBottom: 4,
+                    fontSize: {
+                        xs: '1.8rem',
+                        sm: '2rem',
+                        md: '2.5rem',
+                        lg: '2.5rem',
+                    },
+                }}
+            >
                 Meus Chamados
             </Typography>
-            <Box display="flex" flexDirection="column" gap={4}>
-                {visits.map((visit) => (
-                    <Card key={visit.id} sx={{ display: 'flex', flexDirection: 'column', gap: 1, backgroundColor: '#f3f3f3' }}>
+            <Box display="flex" flexDirection="column" gap={2}>
+
+                {visits.length === 0 ? (
+
+                    <Typography variant="body1" color="textSecondary" align="center" sx={{ mt: 4 }}>
+                        Não há visitas agendadas no momento.
+                    </Typography>
+
+                ) : (visits.map((visit) => (
+
+                    <Card key={visit.id} sx={{ display: 'flex', flexDirection: 'column', gap: 1, backgroundColor: '#f3f3f3', marginBottom: 4 }}>
                         <CardContent>
                             <Typography variant="h6">{visit.description}</Typography>
+
+                            {visit.isToday && (
+                                <Chip label="Hoje" color="primary" sx={{ mb: 1, color: '#ffffff' }} />
+                            )}
+                            {visit.isTomorrow && !visit.isToday && (
+                                <Chip label="Amanhã" color="secondary" sx={{ mb: 1 }} />
+                            )}
+
                             <Typography variant="body2" color="textSecondary">
                                 <strong>Cliente:</strong> {visit.customer}
                             </Typography>
@@ -147,7 +256,7 @@ const MtVisits: React.FC = () => {
                         </CardContent>
                         <CardActions>
                             <Button
-                                onClick={() => handleSave(visit.id, visit.price, visit.comment)}
+                                onClick={() => handleSave(visit.id)}
                                 variant="contained"
                                 disabled={!hasChanges(visit)}
                                 sx={{
@@ -162,7 +271,7 @@ const MtVisits: React.FC = () => {
                             </Button>
                         </CardActions>
                     </Card>
-                ))}
+                )))}
             </Box>
         </Container>
     );

@@ -73,3 +73,18 @@ img {
 .input-border-color {
 	color: #f97316;
 }
+
+.toast-custom {
+	font-size: 16px;
+	padding: 16px;
+}
+
+@media (max-width: 568px) {
+	.toast-custom {
+		margin-top: 10px;
+		font-size: 14px;
+		padding: 8px;
+		width: 60%;
+		margin-left: auto;
+	}
+}

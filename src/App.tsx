@@ -10,6 +10,7 @@ function App() {
 		<BrowserRouter>
 			<AppRoutes />
 			<ToastContainer
+				toastClassName="toast-custom"
 				position='top-right'
 				style={{ marginTop: 50 }}
 				autoClose={3000}

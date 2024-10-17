@@ -88,8 +88,8 @@ const Home: React.FC = () => {
             }));
             setEvents(events);
         } catch (error) {
-            console.error('Error fetching data', error);
-            toast.error('Error fetching data');
+            console.error('Erro ao buscar dados', error);
+            toast.error('Erro ao buscar dados');
         }
     };
 
@@ -123,7 +123,9 @@ const Home: React.FC = () => {
                 )
             );
             setSelectedEvent((prev: any) => ({ ...prev, status: statusInput }));
-            toast.success('Status atualizado com sucesso');
+            toast.success('Status atualizado com sucesso', {
+                className: 'toast-custom',
+            });
         } catch (error) {
             console.error('Erro ao atualizar status', error);
             toast.error('Erro ao atualizar status');

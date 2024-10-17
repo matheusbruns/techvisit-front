@@ -60,8 +60,6 @@ export function Login() {
             ApiService.setAuthorizationHeader(token);
             authlogin(response.user, token);
         } catch (error) {
-            toast.error("Usuário ou senha invalidos!")
-        } finally {
             setIsLoading(false);
         }
     };
@@ -107,7 +105,7 @@ export function Login() {
                                 fullWidth
                                 variant="outlined"
                                 label="Senha"
-                                type={showPassword ? 'text' : 'password'} // Alterna entre texto e senha
+                                type={showPassword ? 'text' : 'password'}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required

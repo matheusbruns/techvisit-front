@@ -8,6 +8,7 @@ import {
     Grid,
     MenuItem,
     InputAdornment,
+    Autocomplete
 } from '@mui/material';
 import { toast } from 'react-toastify';
 import ApiService from '../../../conection/api';
@@ -20,6 +21,8 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import 'dayjs/locale/pt-br';
 import dayjs, { Dayjs } from 'dayjs';
+import { Customer } from '../../customer/ICustomer';
+import { Technician } from '../../technicians/ITechnician';
 
 interface VisitScheduleModalProps {
     open: boolean;
@@ -46,77 +49,93 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({
     const [displayedPrice, setDisplayedPrice] = useState<string>('');
     const AuthContext = useAuth();
 
+    const fetchCustomersAndTechnicians = async () => {
+        try {
+            const organizationId = AuthContext.user.organization.id;
+
+            const customerResponse: any = await ApiService.get(
+                `/customer?organization=${organizationId}`
+            );
+            const customerData = customerResponse.map((customer: any) => ({
+                id: customer.id,
+                name: `${customer.firstName} ${customer.lastName}`,
+                state: customer.state,
+                city: customer.city,
+                neighborhood: customer.neighborhood,
+                street: customer.street,
+                number: customer.number,
+                complement: customer.complement,
+                cep: customer.cep,
+            }));
+            setCustomers(customerData);
+
+            const technicianResponse: any = await ApiService.get(
+                `/technician/get-all?organization=${organizationId}`
+            );
+            const technicianData = technicianResponse.map((technician: any) => ({
+                id: technician.id,
+                name: technician.name,
+            }));
+            setTechnicians(technicianData);
+
+            return { customerData, technicianData };
+        } catch (error) {
+            toast.error('Erro ao buscar dados.');
+            return null;
+        }
+    };
+
     useEffect(() => {
         if (open) {
-            const fetchCustomersAndTechnicians = async () => {
-                try {
-                    const organizationId = AuthContext.user.organization.id;
+            const loadData = async () => {
+                const data = await fetchCustomersAndTechnicians();
 
-                    const customerResponse: any = await ApiService.get(
-                        `/customer?organization=${organizationId}`
+                if (data && visitDataSelected) {
+                    const selectedCustomer = data.customerData.find(
+                        (customer: Customer) => customer.id === visitDataSelected.customer?.id
                     );
-                    const customerData = customerResponse.map((customer: any) => ({
-                        id: customer.id,
-                        name: `${customer.firstName} ${customer.lastName}`,
-                        state: customer.state,
-                        city: customer.city,
-                        neighborhood: customer.neighborhood,
-                        street: customer.street,
-                        number: customer.number,
-                        complement: customer.complement,
-                        cep: customer.cep,
-                    }));
-                    setCustomers(customerData);
+                    const selectedTechnician = data.technicianData.find(
+                        (technician: Technician) => technician.id === visitDataSelected.technician?.id
+                    );
 
-                    const technicianResponse: any = await ApiService.get(
-                        `/technician/get-all?organization=${organizationId}`
+                    setVisitData({
+                        ...visitDataSelected,
+                        customer: selectedCustomer,
+                        technician: selectedTechnician,
+                        price: visitDataSelected.price || 0,
+                        id: visitDataSelected.id,
+                    });
+
+                    setDisplayedPrice(
+                        visitDataSelected.price
+                            ? Number(visitDataSelected.price).toLocaleString('pt-BR', {
+                                style: 'currency',
+                                currency: 'BRL',
+                            })
+                            : 'R$ 0,00'
                     );
-                    const technicianData = technicianResponse.map((technician: any) => ({
-                        id: technician.id,
-                        name: technician.name,
-                    }));
-                    setTechnicians(technicianData);
-                } catch (error) {
-                    toast.error('Erro ao buscar dados de clientes e técnicos.');
+
+                    setStartDateTime(
+                        visitDataSelected.startDateTime
+                            ? dayjs(visitDataSelected.startDateTime)
+                            : null
+                    );
+                    setEndDateTime(
+                        visitDataSelected.endDateTime
+                            ? dayjs(visitDataSelected.endDateTime)
+                            : null
+                    );
+                } else {
+                    setVisitData(initialVisitScheduleData);
+                    setDisplayedPrice('R$ 0,00');
+                    setStartDateTime(null);
+                    setEndDateTime(null);
                 }
             };
-
-            fetchCustomersAndTechnicians();
-
-            if (visitDataSelected) {
-                setVisitData({
-                    ...visitDataSelected,
-                    price: visitDataSelected.price || null,
-                    id: visitDataSelected.id,
-                });
-
-                setDisplayedPrice(
-                    visitDataSelected.price
-                        ? Number(visitDataSelected.price).toLocaleString('pt-BR', {
-                            style: 'currency',
-                            currency: 'BRL',
-                        })
-                        : ''
-                );
-
-                setStartDateTime(
-                    visitDataSelected.startDateTime
-                        ? dayjs(visitDataSelected.startDateTime)
-                        : null
-                );
-                setEndDateTime(
-                    visitDataSelected.endDateTime
-                        ? dayjs(visitDataSelected.endDateTime)
-                        : null
-                );
-            } else {
-                setVisitData(initialVisitScheduleData);
-                setDisplayedPrice('');
-                setStartDateTime(null);
-                setEndDateTime(null);
-            }
+            loadData();
         }
     }, [open, visitDataSelected]);
+
 
 
     const [errors, setErrors] = useState({
@@ -165,26 +184,31 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({
             });
         }
     };
+
     const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const inputValue = e.target.value;
-        const numericValue = parseFloat(
-            inputValue.replace(/[^\d.,-]/g, '').replace(',', '.')
-        );
+        const inputValue = e.target.value.replace(/\D/g, '');
+        const numericValue = parseFloat((parseInt(inputValue, 10) / 100).toFixed(2));
         setVisitData({
             ...visitData,
             price: isNaN(numericValue) ? null : numericValue,
         });
-        setDisplayedPrice(inputValue);
+        setDisplayedPrice(formatPrice(numericValue));
     };
 
     const handlePriceBlur = () => {
         if (visitData.price !== null && !isNaN(visitData.price)) {
-            const formattedValue = visitData.price.toLocaleString('pt-BR', {
-                style: 'currency',
-                currency: 'BRL',
-            });
-            setDisplayedPrice(formattedValue);
+            setDisplayedPrice(formatPrice(visitData.price));
         }
+    };
+
+    const formatPrice = (price: number | null) => {
+        if (!price || isNaN(price)) {
+            return 'R$ 0,00';
+        }
+        return new Intl.NumberFormat('pt-BR', {
+            style: 'currency',
+            currency: 'BRL',
+        }).format(price);
     };
 
     const handleStateChange = (value: string) => {
@@ -197,6 +221,27 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({
             ...prevErrors,
             state: value === '',
         }));
+    };
+
+    const handleCustomerChange = (event: any, newValue: any) => {
+        setVisitData({
+            ...visitData,
+            customer: newValue || null,
+            state: newValue?.state || '',
+            city: newValue?.city || '',
+            neighborhood: newValue?.neighborhood || '',
+            street: newValue?.street || '',
+            number: newValue?.number || '',
+            complement: newValue?.complement || '',
+            cep: newValue?.cep || '',
+        });
+    };
+
+    const handleTechnicianChange = (event: any, newValue: any) => {
+        setVisitData({
+            ...visitData,
+            technician: newValue || null,
+        });
     };
 
     const validateForm = () => {
@@ -330,91 +375,40 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({
                             />
                         </Grid>
                         <Grid item xs={6}>
-                            <TextField
-                                select
-                                fullWidth
-                                label="Cliente"
-                                name="customer"
-                                value={visitData.customer?.id || ''}
-                                onChange={(e) => {
-                                    const selectedCustomer = customers.find(
-                                        (c) => c.id === e.target.value
-                                    );
-
-                                    setVisitData({
-                                        ...visitData,
-                                        customer: selectedCustomer,
-                                        state: selectedCustomer?.state || '',
-                                        city: selectedCustomer?.city || '',
-                                        neighborhood: selectedCustomer?.neighborhood || '',
-                                        street: selectedCustomer?.street || '',
-                                        number: selectedCustomer?.number || '',
-                                        complement: selectedCustomer?.complement || '',
-                                        cep: selectedCustomer?.cep || '',
-                                    });
-                                }}
-                                required
-                                error={errors.customer}
-                                helperText={
-                                    errors.customer
-                                        ? 'Selecione um cliente'
-                                        : ''
-                                }
-                            >
-                                {customers.length > 0 ? (
-                                    customers.map((customer) => (
-                                        <MenuItem
-                                            key={customer.id}
-                                            value={customer.id}
-                                        >
-                                            {customer.name}
-                                        </MenuItem>
-                                    ))
-                                ) : (
-                                    <MenuItem disabled>
-                                        Nenhum cliente encontrado
-                                    </MenuItem>
+                            <Autocomplete
+                                options={customers}
+                                getOptionLabel={(option) => option.name || ''}
+                                value={visitData.customer || null}
+                                onChange={handleCustomerChange}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        label="Cliente"
+                                        required
+                                        error={errors.customer}
+                                        helperText={errors.customer ? 'Selecione um cliente' : ''}
+                                    />
                                 )}
-                            </TextField>
+                                isOptionEqualToValue={(option, value) => option.id === value?.id}
+                            />
                         </Grid>
                         <Grid item xs={6}>
-                            <TextField
-                                select
-                                fullWidth
-                                label="Técnico"
-                                name="technician"
-                                value={visitData.technician?.id || ''}
-                                onChange={(e) =>
-                                    setVisitData({
-                                        ...visitData,
-                                        technician: technicians.find(
-                                            (t) => t.id === e.target.value
-                                        ),
-                                    })
-                                }
-                                required
-                                error={errors.technician}
-                                helperText={
-                                    errors.technician
-                                        ? 'Selecione um técnico'
-                                        : ''
-                                }
-                            >
-                                {technicians.length > 0 ? (
-                                    technicians.map((technician) => (
-                                        <MenuItem
-                                            key={technician.id}
-                                            value={technician.id}
-                                        >
-                                            {technician.name}
-                                        </MenuItem>
-                                    ))
-                                ) : (
-                                    <MenuItem disabled>
-                                        Nenhum técnico encontrado
-                                    </MenuItem>
+                            <Autocomplete
+                                options={technicians}
+                                getOptionLabel={(option) => option.name || ''}
+                                value={visitData.technician || null}
+                                onChange={handleTechnicianChange}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        label="Técnico"
+                                        required
+                                        error={errors.technician}
+                                        helperText={errors.technician ? 'Selecione um técnico' : ''}
+                                    />
                                 )}
-                            </TextField>
+                                isOptionEqualToValue={(option, value) => option.id === value?.id}
+                            />
                         </Grid>
                         <Grid item xs={6}>
                             <StateSelect
@@ -549,7 +543,6 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({
                                 }}
                             />
                         </Grid>
-
                         <Grid item xs={6}>
                             <DateTimePicker
                                 label="Data e Hora de Início"

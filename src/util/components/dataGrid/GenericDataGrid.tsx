@@ -1,24 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Box, styled } from '@mui/material';
+import { Box, LabelDisplayedRowsArgs, paginationClasses, styled } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import CustomToolbar from './customToolbar/CustomToolBar';
 import { GenericDataGridProps } from './IGenericDataGrid';
-
-const customLocaleText = {
-    noRowsLabel: 'Nenhuma linha disponível',
-    columnMenuSortAsc: 'Ordenar crescente',
-    columnMenuSortDesc: 'Ordenar decrescente',
-    columnMenuFilter: 'Filtrar',
-    columnMenuHideColumn: 'Ocultar Coluna',
-    columnMenuShowColumns: 'Mostrar Colunas',
-    columnMenuUnsort: 'Remover ordenação',
-    columnHeaderFiltersTooltipActive: (count: number) => `${count} ${count !== 1 ? 'filtros ativos' : 'filtro ativo'}`,
-    footerRowSelected: (count: { toLocaleString: () => any; }) => `${count.toLocaleString()} linha(s) selecionada(s)`,
-    footerTotalRows: 'Total de Linhas:',
-    footerTotalVisibleRows: (visibleCount: { toLocaleString: () => any; }, totalCount: { toLocaleString: () => any; }) =>
-        `${visibleCount.toLocaleString()} de ${totalCount.toLocaleString()}`,
-
-};
 
 const StyledGridOverlay = styled('div')(({ theme }) => ({
     display: 'flex',
@@ -39,6 +23,21 @@ const StyledGridOverlay = styled('div')(({ theme }) => ({
         }),
     },
 }));
+
+const customLocaleText = {
+    noRowsLabel: 'Nenhuma linha disponível',
+    columnMenuSortAsc: 'Ordenar crescente',
+    columnMenuSortDesc: 'Ordenar decrescente',
+    columnMenuFilter: 'Filtrar',
+    columnMenuHideColumn: 'Ocultar Coluna',
+    columnMenuShowColumns: 'Mostrar Colunas',
+    columnMenuUnsort: 'Remover ordenação',
+    columnHeaderFiltersTooltipActive: (count: number) => `${count} ${count !== 1 ? 'filtros ativos' : 'filtro ativo'}`,
+    footerRowSelected: (count: { toLocaleString: () => any; }) => `${count.toLocaleString()} linha(s) selecionada(s)`,
+    footerTotalRows: 'Total de Linhas:',
+    footerTotalVisibleRows: (visibleCount: { toLocaleString: () => any; }, totalCount: { toLocaleString: () => any; }) =>
+        `${visibleCount.toLocaleString()} de ${totalCount.toLocaleString()}`,
+};
 
 function CustomNoRowsOverlay() {
     return (
@@ -123,6 +122,14 @@ const GenericDataGrid: React.FC<GenericDataGridProps> = ({
                     toolbar: {
                         showQuickFilter: true,
                         quickFilterProps: { debounceMs: 500 },
+                    },
+                    pagination: {
+                        labelDisplayedRows: ({
+                            from,
+                            to,
+                            count,
+                        }: LabelDisplayedRowsArgs) =>
+                            `${from}-${to} de ${count !== -1 ? count : `mais de ${to}`}`,
                     },
                 }}
                 localeText={customLocaleText}

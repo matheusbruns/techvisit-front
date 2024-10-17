@@ -60,8 +60,6 @@ export function Login() {
             ApiService.setAuthorizationHeader(token);
             authlogin(response.user, token);
         } catch (error) {
-            toast.error("Usuário ou senha invalidos!")
-        } finally {
             setIsLoading(false);
         }
     };

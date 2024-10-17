@@ -41,13 +41,34 @@ class ApiService {
     private handleError(error: AxiosError<ErrorResponse>) {
         if (error.response) {
             const status = error.response.status;
+            const data = error.response.data as any;
+            const errorCode = data.errorCode;
 
-            if (status === 403 || status === 401) {
+            if (errorCode === 'INVALID_CREDENTIALS') {
+                toast.error('Usuário ou senha inválidos!');
+            } else if (errorCode === 'USER_INACTIVE') {
+                toast.error('Seu usuário está inativo. Por favor, contate o administrador.');
+            } else if (errorCode === 'TOKEN_EXPIRED') {
                 toast.error('Sessão expirada. Você será redirecionado para o login.');
                 localStorage.removeItem("user");
                 localStorage.removeItem("token");
-                window.location.reload();
+                setTimeout(() => {
+                    window.location.reload();
+                }, 5000);
+            } else if (errorCode === 'ACCESS_DENIED') {
+                toast.error('Acesso negado. Você será redirecionado para o login.');
+                localStorage.removeItem("user");
+                localStorage.removeItem("token");
+                setTimeout(() => {
+                    window.location.reload();
+                }, 5000);
+            } else {
+                toast.error(data.message || 'Ocorreu um erro.');
             }
+        } else if (error.request) {
+            toast.error('Sem resposta do servidor.');
+        } else {
+            toast.error('Erro ao configurar a requisição.');
         }
 
         return Promise.reject(error);

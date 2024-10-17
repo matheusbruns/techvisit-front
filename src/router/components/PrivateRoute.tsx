@@ -23,9 +23,11 @@ export const PrivateRoute: React.FC<{ children: JSX.Element }> = ({ children }) 
     const userJson = localStorage.getItem("user") || '{}';
     const user: any = JSON.parse(userJson);
     const isAdmin = user.role === "ADMIN";
+    const isTechnician = user.role === "TECHNICIAN";
 
     const childPath = window.location.pathname;
     const isAdminAndAdminRoutes = isAdmin && ADMIN_ROUTES.includes(childPath);
+    const isTechnicianRoute = TECHNICIAN_ROUTES.includes(childPath);
 
     if (!islogged) {
         return <Navigate to="/" />;
@@ -33,6 +35,10 @@ export const PrivateRoute: React.FC<{ children: JSX.Element }> = ({ children }) 
 
     if (isAdminAndAdminRoutes) {
         return children;
+    }
+
+    if (isTechnician && !isTechnicianRoute) {
+        return <Navigate to="/techvisit/my-visits" />;
     }
 
     if (!isAdmin && ADMIN_ROUTES.includes(childPath)) {
@@ -43,3 +49,4 @@ export const PrivateRoute: React.FC<{ children: JSX.Element }> = ({ children }) 
 };
 
 const ADMIN_ROUTES = ["/admin/organization", "/admin/users"];
+const TECHNICIAN_ROUTES = ["/techvisit/my-visits"];

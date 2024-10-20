@@ -112,6 +112,7 @@ export function Technician() {
 
     const handleCloseModal = () => {
         setOpenModal(false);
+        setTechnicianDataSelected(null);
     };
 
     const handleDeleteClick = async () => {

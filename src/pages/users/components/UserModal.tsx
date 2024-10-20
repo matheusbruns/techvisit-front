@@ -193,6 +193,7 @@ const UserModal: React.FC<UserModalProps> = ({ open, handleClose, rows, organiza
                         >
                             <MenuItem value={UserRole.ADMIN}>Administrador</MenuItem>
                             <MenuItem value={UserRole.USER}>Usuário comum</MenuItem>
+                            <MenuItem value={UserRole.TECHNICIAN}>Técnico</MenuItem>
                         </TextField>
                     </Grid>
                     <Grid item xs={6}>

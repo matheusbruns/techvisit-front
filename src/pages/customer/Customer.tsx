@@ -117,6 +117,7 @@ const Customer = () => {
 
     const handleCloseModal = () => {
         setOpenModal(false);
+        setCustomerDataSelected(null);
     };
 
     const handleDeleteClick = async () => {

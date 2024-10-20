@@ -102,6 +102,7 @@ export function Organization() {
 
     const handleCloseModal = () => {
         setOpenModal(false);
+        setOrganizationDataSelected(null);
     };
 
     const handleDeleteClick = () => {

@@ -133,7 +133,7 @@ const Customer = () => {
                 refreshGrid();
                 setSelectedRows([]);
             } catch (error) {
-                toast.error("Erro ao excluir cliente");
+                toast.error("Este cliente possui agendamentos e não pode ser excluído");
             }
 
         }

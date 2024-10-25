@@ -62,13 +62,9 @@ class ApiService {
                 setTimeout(() => {
                     window.location.reload();
                 }, 5000);
-            } else {
-                toast.error(data.message || 'Ocorreu um erro.');
             }
         } else if (error.request) {
             toast.error('Sem resposta do servidor.');
-        } else {
-            toast.error('Erro ao configurar a requisição.');
         }
 
         return Promise.reject(new Error(error.message || 'Unknown error'));

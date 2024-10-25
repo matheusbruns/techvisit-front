@@ -58,3 +58,8 @@ export const formatCEP = (value: string) => {
     }
     return value;
 };
+
+export const validatePasswordStrength = (password: string) => {
+    const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+    return strongPasswordRegex.test(password);
+};

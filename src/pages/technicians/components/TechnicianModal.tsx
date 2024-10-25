@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import ApiService from '../../../conection/api';
 import { useAuth } from '../../../contexts/AuthContext';
 import { initialTechnicianData, Technician, TechnicianModalProps } from '../ITechnician';
-import { formatCPF, formatPhoneNumber, isValidCPF } from '../../../util/format/IFunctions';
+import { formatCPF, formatPhoneNumber, isValidCPF, validatePasswordStrength } from '../../../util/format/IFunctions';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 const TechnicianModal: React.FC<TechnicianModalProps> = ({
@@ -18,6 +18,8 @@ const TechnicianModal: React.FC<TechnicianModalProps> = ({
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
     const [isEditingPassword, setIsEditingPassword] = useState<boolean>(false);
+    const [passwordError, setPasswordError] = useState(false);
+    const [passwordEmptyError, setPasswordEmptyError] = useState(false);
     const AuthContext = useAuth();
 
     useEffect(() => {
@@ -76,8 +78,19 @@ const TechnicianModal: React.FC<TechnicianModalProps> = ({
         });
     };
 
-    const validateForm = () => {
+    const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
 
+        setPasswordEmptyError(value === '');
+
+        setTechnicianData({
+            ...technicianData,
+            password: value,
+        });
+        setPasswordError(!validatePasswordStrength(value) && value !== '');
+    };
+
+    const validateForm = () => {
         const cpfExists = rows.some(
             (technician: any) =>
                 technician.cpf === technicianData.cpf && technician.login !== technicianData.login
@@ -100,7 +113,8 @@ const TechnicianModal: React.FC<TechnicianModalProps> = ({
                 !/\S+@\S+\.\S+/.test(technicianData.email) ||
                 emailExists,
             password:
-                (!technicianDataSelected || isEditingPassword) && !technicianData.password,
+                (!technicianDataSelected || isEditingPassword) &&
+                (!technicianData.password || passwordError || passwordEmptyError),
             confirmPassword:
                 (!technicianDataSelected || isEditingPassword) &&
                 technicianData.password !== technicianData.confirmPassword,
@@ -130,6 +144,10 @@ const TechnicianModal: React.FC<TechnicianModalProps> = ({
 
         if (newErrors.confirmPassword) {
             toast.error('As senhas não coincidem!');
+        }
+
+        if (!technicianData.password) {
+            setPasswordEmptyError(true);
         }
 
         return Object.values(newErrors).every((x) => !x);
@@ -191,6 +209,8 @@ const TechnicianModal: React.FC<TechnicianModalProps> = ({
             login: false,
         });
         setIsEditingPassword(false);
+        setPasswordEmptyError(false);
+        setPasswordError(false);
         handleClose();
     };
 
@@ -342,10 +362,17 @@ const TechnicianModal: React.FC<TechnicianModalProps> = ({
                                     name="password"
                                     type={showPassword ? 'text' : 'password'}
                                     value={technicianData.password}
-                                    onChange={handleChange}
+                                    onChange={handlePasswordChange}
                                     required
-                                    error={errors.password}
-                                    helperText={errors.password ? 'Campo obrigatório' : ''}
+                                    error={passwordError || passwordEmptyError}
+                                    helperText={
+                                        passwordEmptyError
+                                            ? 'O campo de senha não pode estar vazio'
+                                            : passwordError
+                                                ? 'A senha deve conter letras maiúsculas, números e caracteres especiais'
+                                                : ''
+                                    }
+
                                     autoComplete="off"
                                     InputProps={{
                                         endAdornment: (

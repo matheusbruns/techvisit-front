@@ -7,7 +7,7 @@ export interface ErrorResponse {
 
 class ApiService {
     private static instance: ApiService;
-    private axiosInstance: AxiosInstance;
+    private readonly axiosInstance: AxiosInstance;
 
     private constructor() {
         this.axiosInstance = axios.create({
@@ -71,7 +71,7 @@ class ApiService {
             toast.error('Erro ao configurar a requisição.');
         }
 
-        return Promise.reject(error);
+        return Promise.reject(new Error(error.message || 'Unknown error'));
     }
 
     public async get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {

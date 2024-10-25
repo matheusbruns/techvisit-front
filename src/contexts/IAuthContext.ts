@@ -1,6 +1,6 @@
 export interface ILogin {
-    login: String,
-    password: String,
+    login: string,
+    password: string,
 }
 
 export interface Organization {

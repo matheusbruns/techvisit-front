@@ -7,12 +7,13 @@ import CustomerModal from './components/CustomerModal';
 import ApiService from '../../conection/api';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-toastify';
+import { Customer as CustomerData } from './ICustomer';
 
 const Customer = () => {
     const [selectedRows, setSelectedRows] = useState<GridRowSelectionModel>([]);
     const [openModal, setOpenModal] = useState(false);
     const [rows, setRows] = useState<any[]>([]);
-    const [customerDataSelected, setCustomerDataSelected] = useState<any | null>(null);
+    const [customerDataSelected, setCustomerDataSelected] = useState<CustomerData | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const AuthContext = useAuth();
 
@@ -21,8 +22,8 @@ const Customer = () => {
         setLoading(true);
         try {
             const organization = AuthContext.user.organization.id;
-            const response: any = await ApiService.get(`/customer?organization=${organization}`);
-            const customers = response.map((customer: any) => ({
+            const response: CustomerData[] = await ApiService.get(`/customer?organization=${organization}`);
+            const customers = response.map((customer: CustomerData) => ({
                 id: customer.id,
                 name: `${customer.firstName} ${customer.lastName}`,
                 firstName: customer.firstName,

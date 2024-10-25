@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { User } from "./IAuthContext";
 
@@ -56,8 +56,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const isAuthenticated = !!user;
 
+    const contextValue = useMemo(
+        () => ({ user, authlogin, logout, isAuthenticated, setUser, setToken }),
+        [user, isAuthenticated]
+    );
+
     return (
-        <AuthContext.Provider value={{ user, authlogin, logout, isAuthenticated, setUser, setToken }}>
+        <AuthContext.Provider value={contextValue}>
             {children}
         </AuthContext.Provider>
     );

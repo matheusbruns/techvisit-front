@@ -56,7 +56,7 @@ export default function MenuProfile() {
         setPasswordError(false);
         setIsEditingPassword(false);
     };
-
+    
     const handleMouseDownPassword = (
         event: React.MouseEvent<HTMLButtonElement>
     ) => {

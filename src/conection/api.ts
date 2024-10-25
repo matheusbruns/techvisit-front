@@ -7,7 +7,7 @@ export interface ErrorResponse {
 
 class ApiService {
     private static instance: ApiService;
-    private axiosInstance: AxiosInstance;
+    private readonly axiosInstance: AxiosInstance;
 
     private constructor() {
         this.axiosInstance = axios.create({
@@ -62,16 +62,12 @@ class ApiService {
                 setTimeout(() => {
                     window.location.reload();
                 }, 5000);
-            } else {
-                toast.error(data.message || 'Ocorreu um erro.');
             }
         } else if (error.request) {
             toast.error('Sem resposta do servidor.');
-        } else {
-            toast.error('Erro ao configurar a requisição.');
         }
 
-        return Promise.reject(error);
+        return Promise.reject(new Error(error.message || 'Unknown error'));
     }
 
     public async get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {

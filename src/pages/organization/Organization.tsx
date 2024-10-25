@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import Header from '../../util/components/header/Header'
 import { Box, Container, Typography } from '@mui/material'
 import TopButtons from '../../util/components/topButtons/TopButtons'
 import GenericDataGrid from '../../util/components/dataGrid/GenericDataGrid'
@@ -7,13 +6,14 @@ import { GridColDef, GridRowSelectionModel } from '@mui/x-data-grid'
 import OrganizationModal from './components/OrganizationModal'
 import ApiService from '../../conection/api';
 import { useAuth } from '../../contexts/AuthContext';
+import { Organization as OrganizationData } from './IOrganization'
 import moment from 'moment'
 
 export function Organization() {
     const [selectedRows, setSelectedRows] = useState<GridRowSelectionModel>([]);
     const [openModal, setOpenModal] = useState(false);
     const [rows, setRows] = useState<any[]>([]);
-    const [organizationDataSelected, setOrganizationDataSelected] = useState<any | null>(null);
+    const [organizationDataSelected, setOrganizationDataSelected] = useState<OrganizationData | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const AuthContext = useAuth();
 
@@ -21,8 +21,8 @@ export function Organization() {
         if (!AuthContext.user) return;
         setLoading(true);
         try {
-            const response: any = await ApiService.get(`/organization`);
-            const organizations = response.map((organization: any) => ({
+            const response: OrganizationData[] = await ApiService.get(`/organization`);
+            const organizations = response.map((organization: OrganizationData) => ({
                 id: organization.id,
                 name: organization.name,
                 externalCode: organization.externalCode,

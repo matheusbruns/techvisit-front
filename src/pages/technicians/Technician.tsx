@@ -7,6 +7,7 @@ import ApiService from '../../conection/api';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-toastify';
 import TechnicianModal from './components/TechnicianModal';
+import { Technician as TechnicianData } from './ITechnician';
 
 export function Technician() {
     const [selectedRows, setSelectedRows] = useState<GridRowSelectionModel>([]);
@@ -21,15 +22,15 @@ export function Technician() {
         setLoading(true);
         try {
             const organization = AuthContext.user.organization.id;
-            const response: any = await ApiService.get(`/technician/get-all?organization=${organization}`);
-            const customers = response.map((customer: any) => ({
-                id: customer.id,
-                name: customer.name,
-                login: customer.login,
-                cpf: customer.cpf,
-                email: customer.email,
-                phoneNumber: customer.phoneNumber,
-                active: customer.active,
+            const response: TechnicianData[] = await ApiService.get(`/technician/get-all?organization=${organization}`);
+            const customers = response.map((technician: TechnicianData) => ({
+                id: technician.id,
+                name: technician.name,
+                login: technician.login,
+                cpf: technician.cpf,
+                email: technician.email,
+                phoneNumber: technician.phoneNumber,
+                active: technician.active,
             }));
             setRows(customers);
         } catch (error) {

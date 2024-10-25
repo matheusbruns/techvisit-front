@@ -5,6 +5,7 @@ import { initialUserData, User, UserRole } from '../IUser';
 import { Organization } from '../../../contexts/IAuthContext';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import ApiService from '../../../conection/api';
+import { validatePasswordStrength } from '../../../util/format/IFunctions';
 
 interface UserModalProps {
     open: boolean;
@@ -39,11 +40,6 @@ const UserModal: React.FC<UserModalProps> = ({ open, handleClose, rows, organiza
             setUserData(initialUserData);
         }
     }, [userDataSelected]);
-
-    const validatePasswordStrength = (password: string) => {
-        const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
-        return strongPasswordRegex.test(password);
-    };
 
     const isLoginDuplicate = (login: string) => {
         return rows.some(row => row.login === login && row.id !== userData.id);

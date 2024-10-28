@@ -1,46 +1,35 @@
-# Getting Started with Create React App
+# Techvisit - Gerenciamento de Agendamentos e Visitas Técnicas
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Techvisit é uma solução SaaS desenvolvida para otimizar o gerenciamento de visitas técnicas realizadas na casa dos clientes, oferecendo praticidade tanto para empresas quanto para técnicos ao organizarem seus chamados e compromissos.
 
-## Available Scripts
+## 📎 Link para a aplicação
+- [Techvisit](https://techvisit.tech)
 
-In the project directory, you can run:
+---
 
-### `npm start`
+## 📜 Visão Geral do Projeto
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### Objetivo
+O **Techvisit** visa simplificar o gerenciamento de visitas técnicas, proporcionando uma experiência intuitiva e eficaz tanto para empresas quanto para técnicos responsáveis pela execução das visitas. Empresas têm acesso a um quadro geral onde podem gerenciar todas as visitas no período desejado, permitindo uma visão ampla e controle sobre os atendimentos. Além disso, é possível cadastrar clientes e técnicos, facilitando a organização e o acesso rápido a informações essenciais. Técnicos podem acessar uma tela personalizada com uma lista de seus próximos serviços, o que aprimora o planejamento diário e o acompanhamento de seus chamados, aumentando a eficiência e organização das operações de atendimento.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+---
 
-### `npm test`
+## 📐 Arquitetura e Tecnologias
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- **Frontend:** React (Typescript)
+- **Componentes:** Material UI
+- **Estilização:** SCSS
+- **Monitoramento de Código:** SonarCloud - [Projeto no SonarCloud](https://sonarcloud.io/project/overview?id=matheusbruns_techvisit-front)
 
-### `npm run build`
+O frontend do Techvisit foi estruturado com foco em **componentização**, garantindo maior organização e reutilização de código. Cada funcionalidade está separada em diretórios específicos, facilitando manutenções e escalabilidade.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Estrutura do Projeto
+- **src/**: Contém os arquivos principais do projeto.
+  - **pages/**: Páginas principais do sistema, organizadas por funcionalidade.
+  - **api/**: Lógica de integração com a API e outras operações externas.
+  - **resources/**: Imagens estáticas, dentre outros recursos.
+  - **router/**: Rotas da aplicação.
+  - **util/**: Funções e utilitários de apoio.
+  - **contexts/**: Contextos para gerenciamento de estados globais e configuração de autenticação.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+---

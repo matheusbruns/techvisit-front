@@ -6,12 +6,11 @@ import {
     Button,
     Typography,
     Grid,
-    MenuItem,
     InputAdornment,
     Autocomplete
 } from '@mui/material';
 import { toast } from 'react-toastify';
-import ApiService from '../../../conection/api';
+import ApiService from '../../../api/ApiService';
 import { VisitScheduleData, initialVisitScheduleData } from '../IVisitSchedule';
 import { useAuth } from '../../../contexts/AuthContext';
 import StateSelect from '../../../util/components/select/StateSelect';
@@ -136,8 +135,6 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({
         }
     }, [open, visitDataSelected]);
 
-
-
     const [errors, setErrors] = useState({
         description: false,
         city: false,
@@ -172,17 +169,28 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        if (name === 'cep') {
-            setVisitData({
-                ...visitData,
-                [name]: formatCEP(value),
-            });
-        } else {
-            setVisitData({
-                ...visitData,
-                [name]: value,
-            });
-        }
+        setVisitData(prevState => {
+            if (name === 'cep') {
+                return {
+                    ...prevState,
+                    [name]: formatCEP(value),
+                };
+            } else if (name === 'comment') {
+                if (value.length <= 1000) {
+                    return {
+                        ...prevState,
+                        [name]: value,
+                    };
+                } else {
+                    return prevState;
+                }
+            } else {
+                return {
+                    ...prevState,
+                    [name]: value,
+                };
+            }
+        });
     };
 
     const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {

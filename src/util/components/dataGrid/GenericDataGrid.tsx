@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Box, LabelDisplayedRowsArgs, paginationClasses, styled } from '@mui/material';
+import React from 'react';
+import { Box, LabelDisplayedRowsArgs, styled } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import CustomToolbar from './customToolbar/CustomToolBar';
 import { GenericDataGridProps } from './IGenericDataGrid';

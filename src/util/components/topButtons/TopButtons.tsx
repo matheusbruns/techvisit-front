@@ -18,7 +18,7 @@ export default function TopButtons({
     onDeleteClick,
     isEditDisabled,
     isDeleteDisabled
-}: ActionButtonsProps) {
+}: Readonly<ActionButtonsProps>) {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
     const handleDeleteClick = (event: React.MouseEvent<HTMLElement>) => {

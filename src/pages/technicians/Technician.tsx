@@ -3,7 +3,7 @@ import { Box, Container, Typography } from '@mui/material';
 import TopButtons from '../../util/components/topButtons/TopButtons';
 import GenericDataGrid from '../../util/components/dataGrid/GenericDataGrid';
 import { GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
-import ApiService from '../../conection/api';
+import ApiService from '../../api/ApiService';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-toastify';
 import TechnicianModal from './components/TechnicianModal';
@@ -13,7 +13,7 @@ export function Technician() {
     const [selectedRows, setSelectedRows] = useState<GridRowSelectionModel>([]);
     const [openModal, setOpenModal] = useState(false);
     const [rows, setRows] = useState<any[]>([]);
-    const [technicianDataSelected, setTechnicianDataSelected] = useState<any | null>(null);
+    const [technicianDataSelected, setTechnicianDataSelected] = useState<TechnicianData | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const AuthContext = useAuth();
 
@@ -31,6 +31,7 @@ export function Technician() {
                 email: technician.email,
                 phoneNumber: technician.phoneNumber,
                 active: technician.active,
+                active_description: technician.active === true ? 'Ativo' : 'Inativo',
             }));
             setRows(customers);
         } catch (error) {
@@ -86,6 +87,13 @@ export function Technician() {
             editable: false,
             disableColumnMenu: true
         },
+        {
+            field: 'active_description',
+            headerName: 'Status',
+            width: 150,
+            editable: false,
+            disableColumnMenu: true,
+        },
     ];
 
     const handleSelectionChange = (newSelection: GridRowSelectionModel) => {
@@ -135,40 +143,38 @@ export function Technician() {
     };
 
     return (
-        <>
-            <Box sx={{ width: '100%', marginTop: 5 }}>
-                <Container maxWidth={false}>
-                    <Typography variant="h4" component="h1" gutterBottom style={{ marginTop: 25 }}>
-                        Técnicos
-                    </Typography>
+        <Box sx={{ width: '100%', marginTop: 5 }}>
+            <Container maxWidth={false}>
+                <Typography variant="h4" component="h1" gutterBottom style={{ marginTop: 25 }}>
+                    Técnicos
+                </Typography>
 
-                    <TopButtons
-                        buttonLabel="Novo Técnico"
-                        onAddClick={handleAddClick}
-                        onEditClick={handleEditClick}
-                        onDeleteClick={handleDeleteClick}
-                        isEditDisabled={selectedRows.length !== 1}
-                        isDeleteDisabled={true}
-                    />
+                <TopButtons
+                    buttonLabel="Novo Técnico"
+                    onAddClick={handleAddClick}
+                    onEditClick={handleEditClick}
+                    onDeleteClick={handleDeleteClick}
+                    isEditDisabled={selectedRows.length !== 1}
+                    isDeleteDisabled={true}
+                />
 
-                    <GenericDataGrid
-                        rows={rows}
-                        columns={columns}
-                        onRowSelectionChange={handleSelectionChange}
-                        pageSizeOptions={[10]}
-                        loading={loading}
-                    />
+                <GenericDataGrid
+                    rows={rows}
+                    columns={columns}
+                    onRowSelectionChange={handleSelectionChange}
+                    pageSizeOptions={[10]}
+                    loading={loading}
+                />
 
-                    <TechnicianModal
-                        open={openModal}
-                        handleClose={handleCloseModal}
-                        rows={rows}
-                        technicianDataSelected={technicianDataSelected}
-                        onSuccess={refreshGrid}
-                    />
+                <TechnicianModal
+                    open={openModal}
+                    handleClose={handleCloseModal}
+                    rows={rows}
+                    technicianDataSelected={technicianDataSelected}
+                    onSuccess={refreshGrid}
+                />
 
-                </Container>
-            </Box>
-        </>
+            </Container>
+        </Box>
     );
 }

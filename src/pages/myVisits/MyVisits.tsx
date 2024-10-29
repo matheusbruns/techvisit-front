@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-toastify';
-import ApiService from '../../conection/api';
+import ApiService from '../../api/ApiService';
 import { VisitScheduleData } from '../visitSchedules/IVisitSchedule';
 
 const MtVisits: React.FC = () => {
@@ -152,10 +152,16 @@ const MtVisits: React.FC = () => {
     };
 
     const handleCommentChange = (event: React.ChangeEvent<HTMLInputElement>, id: number) => {
-        const updatedVisits = visits.map((v) =>
-            v.id === id ? { ...v, comment: event.target.value } : v
-        );
-        setVisits(updatedVisits);
+        const { value } = event.target;
+
+        if (value.length <= 1000) {
+            const updatedVisits = visits.map((v) =>
+                v.id === id ? { ...v, comment: value } : v
+            );
+            setVisits(updatedVisits);
+        } else {
+            toast.error('Comentário muito grande. Limite de 1000 caracteres');
+        }
     };
 
     const formatPrice = (price: number) => {

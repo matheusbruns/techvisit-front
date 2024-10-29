@@ -7,12 +7,12 @@ export interface LoginPayload {
 
 export interface LoginResponse {
     user: {
-        login: String,
+        login: string,
         role: UserRole,
         organization: {
             id: BigInteger,
-            externalCode: String,
-            name: String,
+            externalCode: string,
+            name: string,
         },
     },
     token: string;

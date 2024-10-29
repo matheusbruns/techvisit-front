@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Avatar, Box, Button, ClickAwayListener, Grow, IconButton, MenuItem, MenuList, Paper, Popper, Stack } from '@mui/material';
-import { MenuOutlined, Person } from '@mui/icons-material';
+import { Box, IconButton } from '@mui/material';
+import { MenuOutlined } from '@mui/icons-material';
 import Logo from "../../../resources/images/logo.png";
 import Sidebar from './sidebar/Sidebar';
 import "./Header.scss";

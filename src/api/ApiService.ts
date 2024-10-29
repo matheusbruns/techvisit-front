@@ -40,7 +40,6 @@ class ApiService {
 
     private handleError(error: AxiosError<ErrorResponse>) {
         if (error.response) {
-            const status = error.response.status;
             const data = error.response.data as any;
             const errorCode = data.errorCode;
 

@@ -20,7 +20,7 @@ import { validatePasswordStrength } from '../../../format/IFunctions';
 import { useState } from 'react';
 import { IconButton, InputAdornment } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import api from '../../../../conection/api';
+import api from '../../../../api/ApiService';
 
 export default function MenuProfile() {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);

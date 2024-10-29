@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, Box, TextField, Button, Typography, Grid, InputAdornment, IconButton, Switch, FormControlLabel } from '@mui/material';
 import { toast } from 'react-toastify';
-import ApiService from '../../../conection/api';
+import ApiService from '../../../api/ApiService';
 import { useAuth } from '../../../contexts/AuthContext';
 import { initialTechnicianData, Technician, TechnicianModalProps } from '../ITechnician';
 import { formatCPF, formatPhoneNumber, isValidCPF, validatePasswordStrength } from '../../../util/format/IFunctions';
@@ -154,46 +154,53 @@ const TechnicianModal: React.FC<TechnicianModalProps> = ({
     };
 
     const handleSubmit = async () => {
-        if (validateForm()) {
-            try {
-                const organization = AuthContext.user.organization;
-                technicianData.organization = organization;
+        if (!validateForm()) return;
 
-                const dataToSend = { ...technicianData };
-                if (!isEditingPassword && technicianDataSelected) {
-                    delete dataToSend.password;
-                    delete dataToSend.confirmPassword;
-                }
+        try {
+            const dataToSend = prepareDataToSend();
+            await saveTechnician(dataToSend);
 
-                if (technicianDataSelected) {
-                    await ApiService.put(
-                        `/technician/${technicianData.id}`,
-                        dataToSend
-                    );
-                    toast.success('Técnico atualizado com sucesso!');
-                } else {
-                    await ApiService.post('/technician', dataToSend);
-                    toast.success('Técnico criado com sucesso!');
-                }
+            handleSuccess();
+        } catch (error: any) {
+            handleError(error);
+        }
+    };
 
-                if (onSuccess) {
-                    onSuccess();
-                }
+    const prepareDataToSend = () => {
+        const organization = AuthContext.user.organization;
+        const dataToSend = { ...technicianData, organization };
 
-                setTechnicianData(initialTechnicianData);
-                setIsEditingPassword(false);
-                handleClose();
-            } catch (error: any) {
-                if (error.response && error.response.status === 409) {
-                    toast.error("O login já existe. Escolha outro login.");
-                    setErrors((prevErrors) => ({
-                        ...prevErrors,
-                        login: true,
-                    }));
-                } else {
-                    toast.error('Erro ao salvar técnico');
-                }
-            }
+        if (!isEditingPassword && technicianDataSelected) {
+            delete dataToSend.password;
+            delete dataToSend.confirmPassword;
+        }
+
+        return dataToSend;
+    };
+
+    const saveTechnician = async (dataToSend: typeof technicianData) => {
+        if (technicianDataSelected) {
+            await ApiService.put(`/technician/${technicianData.id}`, dataToSend);
+            toast.success('Técnico atualizado com sucesso!');
+        } else {
+            await ApiService.post('/technician', dataToSend);
+            toast.success('Técnico criado com sucesso!');
+        }
+    };
+
+    const handleSuccess = () => {
+        if (onSuccess) onSuccess();
+        setTechnicianData(initialTechnicianData);
+        setIsEditingPassword(false);
+        handleClose();
+    };
+
+    const handleError = (error: any) => {
+        if (error.response && error.response.status === 409) {
+            toast.error("O login já existe. Escolha outro login.");
+            setErrors((prevErrors) => ({ ...prevErrors, login: true }));
+        } else {
+            toast.error('Erro ao salvar técnico');
         }
     };
 

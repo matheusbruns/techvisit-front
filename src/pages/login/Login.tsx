@@ -4,9 +4,8 @@ import illustration from '../../resources/images/login-illustration.png';
 import './Login.scss';
 import { TextField, Button, Checkbox, FormControlLabel, CircularProgress, Typography, Box, Container, Grid, createTheme, ThemeProvider, IconButton, InputAdornment } from '@mui/material';
 import { useAuth } from '../../contexts/AuthContext';
-import ApiService from '../../conection/api';
+import ApiService from '../../api/ApiService';
 import { LoginResponse } from './ILogin';
-import { toast } from 'react-toastify';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 const theme = createTheme({

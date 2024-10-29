@@ -3,7 +3,7 @@ import { Box, Container, Typography } from '@mui/material';
 import { GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 import TopButtons from '../../util/components/topButtons/TopButtons';
 import GenericDataGrid from '../../util/components/dataGrid/GenericDataGrid';
-import ApiService from '../../conection/api';
+import ApiService from '../../api/ApiService';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-toastify';
 import VisitScheduleModal from './components/VisitScheduleModal';

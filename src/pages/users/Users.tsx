@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Box, Container, Typography } from '@mui/material';
 import TopButtons from '../../util/components/topButtons/TopButtons';
 import GenericDataGrid from '../../util/components/dataGrid/GenericDataGrid';
-import { GridColDef, GridRowSelectionModel, GridValueGetter } from '@mui/x-data-grid';
+import { GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 import UserModal from './components/UserModal';
-import ApiService from '../../conection/api';
+import ApiService from '../../api/ApiService';
 import { useAuth } from '../../contexts/AuthContext';
 import moment from 'moment';
 import { Organization } from '../organization/IOrganization';
-import { getUserRoleDescription, User, UserRole } from './IUser';
+import { getUserRoleDescription, User } from './IUser';
 import { toast } from 'react-toastify';
 
 export function Users() {
@@ -16,7 +16,7 @@ export function Users() {
     const [openModal, setOpenModal] = useState(false);
     const [rows, setRows] = useState<any[]>([]);
     const [organizations, setOrganizations] = useState<Organization[]>([]);
-    const [userDataSelected, setUserDataSelected] = useState<any | null>(null);
+    const [userDataSelected, setUserDataSelected] = useState<User | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const AuthContext = useAuth();
 
@@ -145,41 +145,39 @@ export function Users() {
     };
 
     return (
-        <>
-            <Box sx={{ width: '100%', marginTop: 5 }}>
-                <Container maxWidth={false}>
-                    <Typography variant="h4" component="h1" gutterBottom style={{ marginTop: 25 }}>
-                        Usuários
-                    </Typography>
+        <Box sx={{ width: '100%', marginTop: 5 }}>
+            <Container maxWidth={false}>
+                <Typography variant="h4" component="h1" gutterBottom style={{ marginTop: 25 }}>
+                    Usuários
+                </Typography>
 
-                    <TopButtons
-                        buttonLabel="Novo Usuário"
-                        onAddClick={handleAddClick}
-                        onEditClick={handleEditClick}
-                        onDeleteClick={handleDeleteClick}
-                        isEditDisabled={selectedRows.length !== 1}
-                        isDeleteDisabled={selectedRows.length === 0}
-                    />
+                <TopButtons
+                    buttonLabel="Novo Usuário"
+                    onAddClick={handleAddClick}
+                    onEditClick={handleEditClick}
+                    onDeleteClick={handleDeleteClick}
+                    isEditDisabled={selectedRows.length !== 1}
+                    isDeleteDisabled={selectedRows.length === 0}
+                />
 
-                    <GenericDataGrid
-                        rows={rows}
-                        columns={columns}
-                        onRowSelectionChange={handleSelectionChange}
-                        pageSizeOptions={[10]}
-                        loading={loading}
-                    />
+                <GenericDataGrid
+                    rows={rows}
+                    columns={columns}
+                    onRowSelectionChange={handleSelectionChange}
+                    pageSizeOptions={[10]}
+                    loading={loading}
+                />
 
-                    <UserModal
-                        open={openModal}
-                        handleClose={handleCloseModal}
-                        rows={rows}
-                        organizationList={organizations}
-                        userDataSelected={userDataSelected}
-                        onSuccess={refreshGrid}
-                    />
+                <UserModal
+                    open={openModal}
+                    handleClose={handleCloseModal}
+                    rows={rows}
+                    organizationList={organizations}
+                    userDataSelected={userDataSelected}
+                    onSuccess={refreshGrid}
+                />
 
-                </Container>
-            </Box>
-        </>
+            </Container>
+        </Box>
     );
 }

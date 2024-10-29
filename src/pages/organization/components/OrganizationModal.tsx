@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import { DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import ApiService from '../../../conection/api';
+import ApiService from '../../../api/ApiService';
 import dayjs from 'dayjs';
 import { initialOrganizationData, Organization } from '../IOrganization';
 

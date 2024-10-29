@@ -4,7 +4,7 @@ import { GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 import TopButtons from '../../util/components/topButtons/TopButtons';
 import GenericDataGrid from '../../util/components/dataGrid/GenericDataGrid';
 import CustomerModal from './components/CustomerModal';
-import ApiService from '../../conection/api';
+import ApiService from '../../api/ApiService';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-toastify';
 import { Customer as CustomerData } from './ICustomer';
@@ -140,40 +140,38 @@ const Customer = () => {
     };
 
     return (
-        <>
-            <Box sx={{ width: '100%', marginTop: 5 }}>
-                <Container maxWidth={false}>
-                    <Typography variant="h4" component="h1" gutterBottom style={{ marginTop: 25 }}>
-                        Clientes
-                    </Typography>
+        <Box sx={{ width: '100%', marginTop: 5 }}>
+            <Container maxWidth={false}>
+                <Typography variant="h4" component="h1" gutterBottom style={{ marginTop: 25 }}>
+                    Clientes
+                </Typography>
 
-                    <TopButtons
-                        buttonLabel="Novo Cliente"
-                        onAddClick={handleAddClick}
-                        onEditClick={handleEditClick}
-                        onDeleteClick={handleDeleteClick}
-                        isEditDisabled={selectedRows.length !== 1}
-                        isDeleteDisabled={selectedRows.length === 0}
-                    />
+                <TopButtons
+                    buttonLabel="Novo Cliente"
+                    onAddClick={handleAddClick}
+                    onEditClick={handleEditClick}
+                    onDeleteClick={handleDeleteClick}
+                    isEditDisabled={selectedRows.length !== 1}
+                    isDeleteDisabled={selectedRows.length === 0}
+                />
 
-                    <GenericDataGrid
-                        rows={rows}
-                        columns={columns}
-                        onRowSelectionChange={handleSelectionChange}
-                        pageSizeOptions={[10]}
-                        loading={loading}
-                    />
+                <GenericDataGrid
+                    rows={rows}
+                    columns={columns}
+                    onRowSelectionChange={handleSelectionChange}
+                    pageSizeOptions={[10]}
+                    loading={loading}
+                />
 
-                    <CustomerModal
-                        open={openModal}
-                        handleClose={handleCloseModal}
-                        rows={rows}
-                        customerDataSelected={customerDataSelected}
-                        onSuccess={refreshGrid}
-                    />
-                </Container>
-            </Box>
-        </>
+                <CustomerModal
+                    open={openModal}
+                    handleClose={handleCloseModal}
+                    rows={rows}
+                    customerDataSelected={customerDataSelected}
+                    onSuccess={refreshGrid}
+                />
+            </Container>
+        </Box>
     );
 }
 

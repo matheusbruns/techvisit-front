@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, Box, TextField, Button, Typography, Grid } from '@mui/material';
 import { toast } from 'react-toastify';
-import ApiService from '../../../conection/api';
+import ApiService from '../../../api/ApiService';
 import { Customer, initialCustomerData } from '../ICustomer';
 import { useAuth } from '../../../contexts/AuthContext';
 import { formatCEP, formatCPF, formatPhoneNumber, isValidCPF } from '../../../util/format/IFunctions';
@@ -102,7 +102,7 @@ const CustomerModal: React.FC<CustomerModalProps> = ({ open, handleClose, rows, 
             try {
                 const organization = AuthContext.user.organization;
                 customerData.organization = organization;
-                const response: any = await ApiService.post('/customer', customerData);
+                await ApiService.post('/customer', customerData);
                 toast.success("Cliente salvo com sucesso!");
 
                 if (onSuccess) {

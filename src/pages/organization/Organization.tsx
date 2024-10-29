@@ -4,7 +4,7 @@ import TopButtons from '../../util/components/topButtons/TopButtons'
 import GenericDataGrid from '../../util/components/dataGrid/GenericDataGrid'
 import { GridColDef, GridRowSelectionModel } from '@mui/x-data-grid'
 import OrganizationModal from './components/OrganizationModal'
-import ApiService from '../../conection/api';
+import ApiService from '../../api/ApiService';
 import { useAuth } from '../../contexts/AuthContext';
 import { Organization as OrganizationData } from './IOrganization'
 import moment from 'moment'
@@ -106,46 +106,42 @@ export function Organization() {
     };
 
     const handleDeleteClick = () => {
-        if (selectedRows.length > 0) {
-        }
     };
 
     return (
-        <>
-            <Box sx={{ width: '100%', marginTop: 5 }}>
-                <Container maxWidth={false}>
-                    <Typography variant="h4" component="h1" gutterBottom style={{ marginTop: 25 }}>
-                        Empresas
-                    </Typography>
+        <Box sx={{ width: '100%', marginTop: 5 }}>
+            <Container maxWidth={false}>
+                <Typography variant="h4" component="h1" gutterBottom style={{ marginTop: 25 }}>
+                    Empresas
+                </Typography>
 
-                    <TopButtons
-                        buttonLabel="Nova Empresa"
-                        onAddClick={handleAddClick}
-                        onEditClick={handleEditClick}
-                        onDeleteClick={handleDeleteClick}
-                        isEditDisabled={selectedRows.length !== 1}
-                        // isDeleteDisabled={selectedRows.length === 0}
-                        isDeleteDisabled={true}
-                    />
+                <TopButtons
+                    buttonLabel="Nova Empresa"
+                    onAddClick={handleAddClick}
+                    onEditClick={handleEditClick}
+                    onDeleteClick={handleDeleteClick}
+                    isEditDisabled={selectedRows.length !== 1}
+                    // isDeleteDisabled={selectedRows.length === 0}
+                    isDeleteDisabled={true}
+                />
 
-                    <GenericDataGrid
-                        rows={rows}
-                        columns={columns}
-                        onRowSelectionChange={handleSelectionChange}
-                        pageSizeOptions={[10]}
-                        loading={loading}
-                    />
+                <GenericDataGrid
+                    rows={rows}
+                    columns={columns}
+                    onRowSelectionChange={handleSelectionChange}
+                    pageSizeOptions={[10]}
+                    loading={loading}
+                />
 
-                    <OrganizationModal
-                        open={openModal}
-                        handleClose={handleCloseModal}
-                        rows={rows}
-                        organizationDataSelected={organizationDataSelected}
-                        onSuccess={refreshGrid}
-                    />
+                <OrganizationModal
+                    open={openModal}
+                    handleClose={handleCloseModal}
+                    rows={rows}
+                    organizationDataSelected={organizationDataSelected}
+                    onSuccess={refreshGrid}
+                />
 
-                </Container>
-            </Box>
-        </>
+            </Container>
+        </Box>
     )
 }

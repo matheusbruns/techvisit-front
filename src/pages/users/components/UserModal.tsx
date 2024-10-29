@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Box, TextField, Button, Typography, Grid, MenuItem, FormControlLabel, Checkbox, InputAdornment, IconButton, Switch } from '@mui/material';
+import { Modal, Box, TextField, Button, Typography, Grid, MenuItem, FormControlLabel, InputAdornment, IconButton, Switch } from '@mui/material';
 import { toast } from 'react-toastify';
 import { initialUserData, User, UserRole } from '../IUser';
 import { Organization } from '../../../contexts/IAuthContext';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import ApiService from '../../../conection/api';
+import ApiService from '../../../api/ApiService';
 import { validatePasswordStrength } from '../../../util/format/IFunctions';
 
 interface UserModalProps {

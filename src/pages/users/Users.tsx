@@ -77,7 +77,7 @@ export function Users() {
         },
         {
             field: 'organization',
-            headerName: 'Organização',
+            headerName: 'Empresa',
             width: 250,
             editable: false,
             disableColumnMenu: true

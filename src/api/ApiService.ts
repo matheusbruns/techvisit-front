@@ -53,14 +53,14 @@ class ApiService {
                 localStorage.removeItem("token");
                 setTimeout(() => {
                     window.location.reload();
-                }, 5000);
+                }, 1000);
             } else if (errorCode === 'ACCESS_DENIED') {
                 toast.error('Acesso negado. Você será redirecionado para o login.');
                 localStorage.removeItem("user");
                 localStorage.removeItem("token");
                 setTimeout(() => {
                     window.location.reload();
-                }, 5000);
+                }, 1000);
             }
         } else if (error.request) {
             toast.error('Sem resposta do servidor.');

@@ -54,10 +54,10 @@ export default function TopButtons({
                 {buttonLabel}
             </Button>
             <Box sx={{ display: 'flex', gap: '5px' }}>
-                <IconButton onClick={onEditClick} disabled={isEditDisabled}>
+                <IconButton onClick={onEditClick} disabled={isEditDisabled} aria-label="Editar">
                     <Edit />
                 </IconButton>
-                <IconButton onClick={handleDeleteClick} disabled={isDeleteDisabled}>
+                <IconButton onClick={handleDeleteClick} disabled={isDeleteDisabled} aria-label="Excluir">
                     <Delete />
                 </IconButton>
 
@@ -86,6 +86,7 @@ export default function TopButtons({
                                 Cancelar
                             </Button>
                             <Button
+                                aria-label="Excluir"
                                 variant="contained"
                                 color="error"
                                 onClick={handleConfirmDelete}

@@ -9,7 +9,6 @@
     "@mui/material": "^5.16.7",
     "@mui/x-data-grid": "^7.12.1",
     "@mui/x-date-pickers": "^7.18.0",
-    "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.5.2",
@@ -32,7 +31,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "react-scripts test --coverage",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -54,6 +53,9 @@
     ]
   },
   "devDependencies": {
-    "@types/react-big-calendar": "^1.8.10"
+    "@testing-library/jest-dom": "^6.6.3",
+    "@types/react-big-calendar": "^1.8.10",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^27.5.1"
   }
 }

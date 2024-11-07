@@ -123,11 +123,6 @@ export function Login() {
                                     ),
                                 }}
                             />
-                            <FormControlLabel
-                                control={<Checkbox id="remember" />}
-                                label="Lembrar"
-                                className="remember-me"
-                            />
                             <Box textAlign="center" mt={2}>
                                 <Button
                                     className=''

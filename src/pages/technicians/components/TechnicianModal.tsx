@@ -90,6 +90,14 @@ const TechnicianModal: React.FC<TechnicianModalProps> = ({
         setPasswordError(!validatePasswordStrength(value) && value !== '');
     };
 
+    let passwordHelperText = '';
+
+    if (passwordEmptyError) {
+        passwordHelperText = 'O campo de senha não pode estar vazio';
+    } else if (passwordError) {
+        passwordHelperText = 'A senha deve conter letras maiúsculas, números e caracteres especiais';
+    }
+
     const validateForm = () => {
         const cpfExists = rows.some(
             (technician: any) =>
@@ -239,7 +247,7 @@ const TechnicianModal: React.FC<TechnicianModalProps> = ({
         <Modal open={open} onClose={handleClose}>
             <Box
                 component="form"
-                autoComplete="off"
+                autoComplete="nope"
                 sx={{
                     position: 'absolute',
                     top: '50%',
@@ -267,7 +275,7 @@ const TechnicianModal: React.FC<TechnicianModalProps> = ({
                             required
                             error={errors.name}
                             helperText={errors.name ? 'Campo obrigatório' : ''}
-                            autoComplete="off"
+                            autoComplete="nope"
                         />
                     </Grid>
                     <Grid item xs={6}>
@@ -281,7 +289,7 @@ const TechnicianModal: React.FC<TechnicianModalProps> = ({
                             required
                             error={errors.cpf}
                             helperText={errors.cpf ? 'CPF inválido ou já cadastrado' : ''}
-                            autoComplete="off"
+                            autoComplete="nope"
                         />
                     </Grid>
                     <Grid item xs={6}>
@@ -297,7 +305,7 @@ const TechnicianModal: React.FC<TechnicianModalProps> = ({
                             helperText={
                                 errors.phoneNumber ? 'Número de telefone inválido' : ''
                             }
-                            autoComplete="off"
+                            autoComplete="nope"
                         />
                     </Grid>
                     <Grid item xs={12}>
@@ -313,7 +321,7 @@ const TechnicianModal: React.FC<TechnicianModalProps> = ({
                             helperText={
                                 errors.email ? 'Email inválido ou já cadastrado' : ''
                             }
-                            autoComplete="off"
+                            autoComplete="nope"
                         />
                     </Grid>
                     <Grid item xs={12}>
@@ -329,7 +337,7 @@ const TechnicianModal: React.FC<TechnicianModalProps> = ({
                             helperText={
                                 errors.login ? 'Login já cadastrado ou inválido' : ''
                             }
-                            autoComplete="off"
+                            autoComplete="nope"
                             disabled={Boolean(technicianDataSelected)}
                         />
                     </Grid>
@@ -372,15 +380,8 @@ const TechnicianModal: React.FC<TechnicianModalProps> = ({
                                     onChange={handlePasswordChange}
                                     required
                                     error={passwordError || passwordEmptyError}
-                                    helperText={
-                                        passwordEmptyError
-                                            ? 'O campo de senha não pode estar vazio'
-                                            : passwordError
-                                                ? 'A senha deve conter letras maiúsculas, números e caracteres especiais'
-                                                : ''
-                                    }
-
-                                    autoComplete="off"
+                                    helperText={passwordHelperText}
+                                    autoComplete="nope"
                                     InputProps={{
                                         endAdornment: (
                                             <InputAdornment position="end">
@@ -415,7 +416,7 @@ const TechnicianModal: React.FC<TechnicianModalProps> = ({
                                     helperText={
                                         errors.confirmPassword ? 'As senhas não coincidem' : ''
                                     }
-                                    autoComplete="off"
+                                    autoComplete="nope"
                                     InputProps={{
                                         endAdornment: (
                                             <InputAdornment position="end">

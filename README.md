@@ -33,3 +33,48 @@ O frontend do Techvisit foi estruturado com foco em **componentização**, garan
   - **contexts/**: Contextos para gerenciamento de estados globais e configuração de autenticação.
 
 ---
+
+## 🚀 Instalação e Execução do Projeto
+
+Siga os passos abaixo para configurar e executar o frontend do Techvisit localmente.
+
+### Pré-requisitos
+
+- [Node.js](https://nodejs.org/) versão 16 ou superior
+- [Git](https://git-scm.com/)
+
+### Passos para Clonar e Instalar Dependências
+
+1. **Clone o repositório**:
+
+   ```bash
+   git clone https://github.com/matheusbruns/techvisit-front.git
+   ```
+   ```bash
+   cd techvisit-front
+   ```
+
+2. **Instale as dependências**:
+
+   Certifique-se de estar no diretório raiz do projeto e execute:
+
+   ```bash
+   npm install
+   ```
+
+### Executando o Projeto
+
+Após instalar as dependências, execute o projeto com o comando:
+
+```bash
+npm start
+```
+
+A aplicação estará disponível em `http://localhost:3000` por padrão.
+
+---
+
+## 🔍 Monitoramento de Código
+
+Este projeto utiliza SonarCloud para monitoramento de qualidade de código e análise estática. Confira o projeto no SonarCloud [aqui](https://sonarcloud.io/summary/overall?id=matheusbruns_techvisit-front).
+

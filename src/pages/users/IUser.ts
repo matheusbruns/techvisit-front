@@ -31,7 +31,7 @@ export const getUserRoleDescription = (role: UserRole | string): string => {
         case UserRole.ADMIN:
             return 'Usuário Administrador';
         case UserRole.USER:
-            return 'Usuário Comum';
+            return 'Gestor';
         case UserRole.TECHNICIAN:
             return 'Técnico';
         default:

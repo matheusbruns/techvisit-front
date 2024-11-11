@@ -52,13 +52,22 @@ const UserModal: React.FC<UserModalProps> = ({ open, handleClose, rows, organiza
             organization: !userData.organization?.id,
         };
 
+        if (!userDataSelected && userData.role === UserRole.TECHNICIAN) {
+            newErrors.role = true;
+        }
+
         setErrors(newErrors);
+
         return Object.values(newErrors).every((x) => !x);
     };
 
     const handleSubmit = async () => {
         if (!validateForm()) {
-            toast.error('Por favor, preencha todos os campos obrigatórios e verifique se o login já existe.');
+            if (!userDataSelected && userData.role === UserRole.TECHNICIAN) {
+                toast.error('Não é permitido cadastrar um novo usuário com a função de Técnico.');
+            } else {
+                toast.error('Por favor, preencha todos os campos obrigatórios e verifique se o login já existe.');
+            }
             return;
         }
 
@@ -142,6 +151,10 @@ const UserModal: React.FC<UserModalProps> = ({ open, handleClose, rows, organiza
         }
     };
 
+    const availableRoles = userDataSelected
+        ? [UserRole.ADMIN, UserRole.USER, UserRole.TECHNICIAN]
+        : [UserRole.ADMIN, UserRole.USER];
+
     return (
         <Modal open={open} onClose={handleClose}>
             <Box
@@ -186,10 +199,17 @@ const UserModal: React.FC<UserModalProps> = ({ open, handleClose, rows, organiza
                             required
                             error={errors.role}
                             helperText={errors.role ? 'Campo obrigatório' : ''}
+                            disabled={userData.role === UserRole.TECHNICIAN}
                         >
-                            <MenuItem value={UserRole.ADMIN}>Administrador</MenuItem>
-                            <MenuItem value={UserRole.USER}>Usuário comum</MenuItem>
-                            <MenuItem value={UserRole.TECHNICIAN}>Técnico</MenuItem>
+                            {availableRoles.map((role) => (
+                                <MenuItem key={role} value={role}>
+                                    {role === UserRole.ADMIN ? 'Administrador' : 'Gestor'}
+                                </MenuItem>
+                            ))}
+                            {/* Se estiver editando um usuário e a função for Técnico, mostrar a opção */}
+                            {userDataSelected && userData.role === UserRole.TECHNICIAN && (
+                                <MenuItem value={UserRole.TECHNICIAN}>Técnico</MenuItem>
+                            )}
                         </TextField>
                     </Grid>
                     <Grid item xs={6}>
@@ -212,7 +232,6 @@ const UserModal: React.FC<UserModalProps> = ({ open, handleClose, rows, organiza
                         </TextField>
                     </Grid>
                     <Grid item xs={12}>
-
                         <FormControlLabel
                             control={
                                 <Switch

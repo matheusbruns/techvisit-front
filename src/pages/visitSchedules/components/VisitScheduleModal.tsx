@@ -149,6 +149,7 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({
         technician: false,
         startDateTime: false,
         endDateTime: false,
+        dateOrder: false
     });
 
     const handleStartDateChange = (newValue: Dayjs | null) => {
@@ -157,6 +158,12 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({
             ...prevVisitData,
             startDateTime: newValue ? newValue.toDate() : null,
         }));
+
+        setErrors((prevErrors) => ({
+            ...prevErrors,
+            startDateTime: !newValue,
+            dateOrder: false,
+        }));
     };
 
     const handleEndDateChange = (newValue: Dayjs | null) => {
@@ -164,6 +171,12 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({
         setVisitData((prevVisitData) => ({
             ...prevVisitData,
             endDateTime: newValue ? newValue.toDate() : null,
+        }));
+
+        setErrors((prevErrors) => ({
+            ...prevErrors,
+            endDateTime: !newValue,
+            dateOrder: false,
         }));
     };
 
@@ -267,6 +280,10 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({
             technician: !visitData.technician?.id,
             startDateTime: !startDateTime,
             endDateTime: !endDateTime,
+            dateOrder:
+                startDateTime && endDateTime
+                    ? endDateTime.isBefore(startDateTime)
+                    : false,
         };
 
         setErrors(newErrors);
@@ -335,9 +352,24 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({
             technician: false,
             startDateTime: false,
             endDateTime: false,
+            dateOrder: false,
         });
         handleClose();
     };
+
+    let startDateTimeHelperText = '';
+    if (errors.startDateTime) {
+        startDateTimeHelperText = 'Selecione a data e hora de início';
+    } else if (errors.dateOrder) {
+        startDateTimeHelperText = 'A data de início deve ser anterior à data de fim';
+    }
+
+    let endDateTimeHelperText = '';
+    if (errors.endDateTime) {
+        endDateTimeHelperText = 'Selecione a data e hora de fim';
+    } else if (errors.dateOrder) {
+        endDateTimeHelperText = 'A data de fim deve ser posterior à data de início';
+    }
 
     return (
         <Modal open={open} onClose={handleClose}>
@@ -575,10 +607,10 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({
                                 slotProps={{
                                     textField: {
                                         fullWidth: true,
-                                        error: errors.startDateTime,
-                                        helperText: errors.startDateTime
-                                            ? 'Selecione a data e hora de início'
-                                            : '',
+                                        error:
+                                            errors.startDateTime ||
+                                            errors.dateOrder,
+                                        helperText: startDateTimeHelperText,
                                     },
                                 }}
                             />
@@ -608,10 +640,10 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({
                                 slotProps={{
                                     textField: {
                                         fullWidth: true,
-                                        error: errors.endDateTime,
-                                        helperText: errors.endDateTime
-                                            ? 'Selecione a data e hora de fim'
-                                            : '',
+                                        error:
+                                            errors.endDateTime ||
+                                            errors.dateOrder,
+                                        helperText: endDateTimeHelperText,
                                     },
                                 }}
                             />

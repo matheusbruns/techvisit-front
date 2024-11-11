@@ -8,6 +8,13 @@ module.exports = {
     coverageDirectory: 'coverage',
     coverageReporters: ['lcov', 'text'],
     transform: {
-        '^.+\\.(ts|tsx)$': 'ts-jest',
+        '^.+\\.(ts|tsx|js|jsx)$': 'ts-jest',
     },
+    transformIgnorePatterns: [
+        '/node_modules/(?!(axios)/)',
+    ],
+    setupFilesAfterEnv: ['@testing-library/jest-dom/extend-expect'],
+    testMatch: [
+        '**/src/pages/**/?(*.)+(test|spec|Teste).[tj]s?(x)',
+    ],
 };

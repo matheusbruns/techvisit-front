@@ -4,6 +4,9 @@ import { Users } from './Users';
 import { useAuth } from '../../contexts/AuthContext';
 import ApiService from '../../api/ApiService';
 import '@testing-library/jest-dom';
+import UserModal from './components/UserModal';
+import { toast } from 'react-toastify';
+import { UserRole } from './IUser';
 
 jest.mock('../../contexts/AuthContext', () => ({
     useAuth: jest.fn(),
@@ -11,6 +14,8 @@ jest.mock('../../contexts/AuthContext', () => ({
 
 jest.mock('../../api/ApiService', () => ({
     get: jest.fn(),
+    post: jest.fn(),
+    put: jest.fn(),
     delete: jest.fn(),
 }));
 
@@ -20,14 +25,6 @@ jest.mock('react-toastify', () => ({
         error: jest.fn(),
     },
 }));
-
-jest.mock('./components/UserModal', () => (props: any) => {
-    return props.open ? (
-        <div>
-            <h2>{props.userDataSelected ? 'Editar Usuário' : 'Adicionar Usuário'}</h2>
-        </div>
-    ) : null;
-});
 
 jest.mock('../../util/components/dataGrid/GenericDataGrid', () => (props: any) => {
     return (
@@ -58,7 +55,7 @@ const mockUsers = [
         login: 'user1',
         role: 'ADMIN',
         role_description: 'Administrador',
-        organization: 'Empresa A',
+        organization: { id: 1, name: 'Empresa A' },
         formattedCreationDate: '01/01/2021',
         active: true,
         active_description: 'Ativo',
@@ -68,7 +65,7 @@ const mockUsers = [
         login: 'user2',
         role: 'USER',
         role_description: 'Usuário',
-        organization: 'Empresa B',
+        organization: { id: 2, name: 'Empresa B' },
         formattedCreationDate: '02/01/2021',
         active: false,
         active_description: 'Inativo',
@@ -138,7 +135,7 @@ describe('Componente Users', () => {
         const addButton = screen.getByText('Novo Usuário');
         fireEvent.click(addButton);
 
-        expect(screen.getByText('Adicionar Usuário')).toBeInTheDocument();
+        expect(screen.getByText('Criar Novo Usuário')).toBeInTheDocument();
     });
 
     test('deve abrir o modal de edição ao clicar no botão "Editar"', async () => {
@@ -160,5 +157,143 @@ describe('Componente Users', () => {
 
         expect(screen.getByText('Editar Usuário')).toBeInTheDocument();
     });
+});
 
+describe('Componente UserModal', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+        (useAuth as jest.Mock).mockReturnValue(mockAuthContextValue);
+    });
+
+    const defaultProps = {
+        open: true,
+        handleClose: jest.fn(),
+        rows: mockUsers,
+        organizationList: mockOrganizations,
+        onSuccess: jest.fn(),
+    };
+
+    test('deve renderizar corretamente ao criar um novo usuário', () => {
+        render(<UserModal {...defaultProps} />);
+
+        expect(screen.getByText('Criar Novo Usuário')).toBeInTheDocument();
+        expect(screen.getByLabelText(/^Login/i)).toBeInTheDocument();
+        expect(screen.getByLabelText(/^Função/i)).toBeInTheDocument();
+        expect(screen.getByLabelText(/^Empresa/i)).toBeInTheDocument();
+        expect(screen.getByLabelText(/^Senha/i)).toBeInTheDocument();
+        expect(screen.getByLabelText(/^Confirmar Senha/i)).toBeInTheDocument();
+
+        fireEvent.mouseDown(screen.getByLabelText(/^Função/i));
+        expect(screen.queryByText('Técnico')).not.toBeInTheDocument();
+    });
+
+    test('não deve permitir selecionar a função Técnico ao criar um novo usuário', () => {
+        render(<UserModal {...defaultProps} />);
+
+        const roleField = screen.getByLabelText(/^Função/i);
+        fireEvent.mouseDown(roleField);
+
+        expect(screen.queryByText('Técnico')).not.toBeInTheDocument();
+    });
+
+
+    test('deve renderizar corretamente ao editar um usuário com função Técnico', () => {
+        const technicianUser = {
+            ...mockUsers[0],
+            role: UserRole.TECHNICIAN,
+            role_description: 'Técnico',
+        };
+
+        render(<UserModal {...defaultProps} userDataSelected={technicianUser} />);
+
+        expect(screen.getByText('Editar Usuário')).toBeInTheDocument();
+        expect(screen.getByLabelText(/^Login/i)).toHaveValue(technicianUser.login);
+        expect(screen.getByLabelText(/^Função/i)).toHaveTextContent('Técnico');
+
+        expect(screen.getByLabelText(/^Função/i)).toHaveAttribute('aria-disabled', 'true');
+    });
+
+    test('deve desabilitar o campo Função ao editar um usuário com função Técnico', () => {
+        const technicianUser = {
+            ...mockUsers[0],
+            role: UserRole.TECHNICIAN,
+            role_description: 'Técnico',
+        };
+
+        render(<UserModal {...defaultProps} userDataSelected={technicianUser} />);
+
+        expect(screen.getByLabelText(/^Função/i)).toHaveAttribute('aria-disabled', 'true');
+    });
+
+    test('deve permitir salvar um usuário com função ADMIN ao criar novo usuário', async () => {
+        render(<UserModal {...defaultProps} />);
+
+        fireEvent.change(screen.getByLabelText(/^Login/i), { target: { value: 'newadmin' } });
+        fireEvent.mouseDown(screen.getByLabelText(/^Função/i));
+        fireEvent.click(screen.getByText('Administrador'));
+
+        fireEvent.mouseDown(screen.getByLabelText(/^Empresa/i));
+        fireEvent.click(screen.getByText('Empresa A'));
+
+        fireEvent.change(screen.getByLabelText(/^Senha/i), { target: { value: 'Password123!' } });
+        fireEvent.change(screen.getByLabelText(/^Confirmar Senha/i), { target: { value: 'Password123!' } });
+
+        (ApiService.post as jest.Mock).mockResolvedValueOnce({});
+
+        fireEvent.click(screen.getByText('Salvar'));
+
+        await waitFor(() => {
+            expect(ApiService.post).toHaveBeenCalledWith('/auth/register', expect.any(Object));
+            expect(toast.success).toHaveBeenCalledWith('Usuário criado com sucesso');
+        });
+    });
+
+    test('deve mostrar erro ao tentar salvar com senhas que não coincidem', async () => {
+        render(<UserModal {...defaultProps} />);
+
+        fireEvent.change(screen.getByLabelText(/^Login/i), { target: { value: 'newuser' } });
+        fireEvent.mouseDown(screen.getByLabelText(/^Função/i));
+        fireEvent.click(screen.getByText('Administrador'));
+
+        fireEvent.mouseDown(screen.getByLabelText(/^Empresa/i));
+        fireEvent.click(screen.getByText('Empresa A'));
+
+        fireEvent.change(screen.getByLabelText(/^Senha/i), { target: { value: 'Password123!' } });
+        fireEvent.change(screen.getByLabelText(/^Confirmar Senha/i), { target: { value: 'DifferentPassword!' } });
+
+        fireEvent.click(screen.getByText('Salvar'));
+
+        await waitFor(() => {
+            expect(toast.error).toHaveBeenCalledWith('As senhas não coincidem.');
+        });
+    });
+
+    test('deve mostrar erro ao tentar salvar com senha fraca', async () => {
+        render(<UserModal {...defaultProps} />);
+
+        fireEvent.change(screen.getByLabelText(/^Login/i), { target: { value: 'newuser' } });
+        fireEvent.mouseDown(screen.getByLabelText(/^Função/i));
+        fireEvent.click(screen.getByText('Administrador'));
+
+        fireEvent.mouseDown(screen.getByLabelText(/^Empresa/i));
+        fireEvent.click(screen.getByText('Empresa A'));
+
+        fireEvent.change(screen.getByLabelText(/^Senha/i), { target: { value: 'weak' } });
+        fireEvent.change(screen.getByLabelText(/^Confirmar Senha/i), { target: { value: 'weak' } });
+
+        fireEvent.click(screen.getByText('Salvar'));
+
+        await waitFor(() => {
+            expect(screen.getByText('A senha deve ter pelo menos 8 caracteres, incluindo maiúsculas, minúsculas, números e símbolos.')).toBeInTheDocument();
+        });
+    });
+
+    test('deve fechar o modal ao clicar no botão "Cancelar"', () => {
+        render(<UserModal {...defaultProps} />);
+
+        const cancelButton = screen.getByText('Cancelar');
+        fireEvent.click(cancelButton);
+
+        expect(defaultProps.handleClose).toHaveBeenCalled();
+    });
 });

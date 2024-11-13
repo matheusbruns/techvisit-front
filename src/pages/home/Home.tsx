@@ -171,13 +171,13 @@ const Home: React.FC = () => {
                     Quadro Geral
                 </Typography>
 
-                <Box sx={{ height: '80vh', width: '100%', backgroundColor: '#fbfbfb' }}>
+                <Box sx={{ height: '80vh', width: '100%', backgroundColor: '#fbfbfb', marginBottom: 4 }}>
                     <Calendar
                         localizer={localizer}
                         events={events}
                         startAccessor="start"
                         endAccessor="end"
-                        style={{ height: '100%' }}
+                        style={{ height: '100%'}}
                         eventPropGetter={eventStyleGetter}
                         onSelectEvent={handleSelectEvent}
                         messages={messages}

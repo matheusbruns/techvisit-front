@@ -249,17 +249,18 @@ const TechnicianModal: React.FC<TechnicianModalProps> = ({
                 component="form"
                 autoComplete="nope"
                 sx={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
+                    position: 'relative',
+                    top: '10%',
+                    margin: 'auto',
                     width: { xs: '90%', sm: 500, md: 600 },
-                    maxHeight: '90vh',
+                    maxHeight: '80vh',
                     overflowY: 'auto',
                     bgcolor: 'background.paper',
                     boxShadow: 24,
                     p: 4,
                     borderRadius: 2,
+                    mt: 3,
+                    mb: 3,
                 }}
             >
                 <Typography variant="h6" component="h2" gutterBottom>

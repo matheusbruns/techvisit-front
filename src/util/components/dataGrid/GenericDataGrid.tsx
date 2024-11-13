@@ -89,7 +89,7 @@ const GenericDataGrid: React.FC<GenericDataGridProps> = ({
                 sx={{
                     boxShadow: 1,
                     border: 1,
-                    borderColor: '#3A3A3A',
+                    borderColor: '#3A3A38',
                     '& .MuiDataGrid-cell:hover': {
                         color: '#3A3A3A',
                     },

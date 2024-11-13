@@ -260,8 +260,8 @@ const TechnicianModal: React.FC<TechnicianModalProps> = ({
                     boxShadow: 24,
                     p: 4,
                     borderRadius: 2,
-                    mt: 5,
-                    mb: 5,
+                    mt: { xs: 2, sm: 5 },
+                    mb: { xs: 2, sm: 5 },
                 }}
             >
                 <Typography variant="h6" component="h2" gutterBottom>

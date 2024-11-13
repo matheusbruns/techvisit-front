@@ -250,18 +250,18 @@ const TechnicianModal: React.FC<TechnicianModalProps> = ({
                 autoComplete="nope"
                 sx={{
                     position: 'absolute',
-                    top: '50%',
+                    top: '44%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
                     width: { xs: '90%', sm: 500, md: 600 },
-                    maxHeight: '90vh',
+                    maxHeight: '87vh',
                     overflowY: 'auto',
                     bgcolor: 'background.paper',
                     boxShadow: 24,
                     p: 4,
                     borderRadius: 2,
-                    mt: { xs: 2, sm: 5 },
-                    mb: { xs: 2, sm: 5 },
+                    mt: 2,
+                    mb: 2,
                 }}
             >
                 <Typography variant="h6" component="h2" gutterBottom>

@@ -259,8 +259,8 @@ const TechnicianModal: React.FC<TechnicianModalProps> = ({
                     boxShadow: 24,
                     p: 4,
                     borderRadius: 2,
-                    mt: 3,
-                    mb: 3,
+                    mt: 10,
+                    mb: 10,
                 }}
             >
                 <Typography variant="h6" component="h2" gutterBottom>

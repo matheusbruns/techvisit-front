@@ -250,11 +250,11 @@ const TechnicianModal: React.FC<TechnicianModalProps> = ({
                 autoComplete="nope"
                 sx={{
                     position: 'absolute',
-                    top: '44%',
+                    top: '48%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
                     width: { xs: '90%', sm: 500, md: 600 },
-                    maxHeight: '87vh',
+                    maxHeight: '88vh',
                     overflowY: 'auto',
                     bgcolor: 'background.paper',
                     boxShadow: 24,

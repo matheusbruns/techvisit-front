@@ -383,7 +383,7 @@ const VisitScheduleModal: React.FC<VisitScheduleModalProps> = ({
                     transform: 'translate(-50%, -50%)',
 
                     width: { xs: '90%', sm: 500, md: 600 },
-                    maxHeight: '90vh',
+                    maxHeight: '88vh',
                     overflowY: 'auto',
 
                     bgcolor: 'background.paper',

@@ -144,16 +144,16 @@ const Home: React.FC = () => {
 
         switch (event.status) {
             case VisitScheduleStatus.ATTENDED:
-                backgroundColor = '#3CBC00';
+                backgroundColor = '#46b313c2';
                 break;
             case VisitScheduleStatus.NOT_ATTENDED:
-                backgroundColor = '#CF0205';
+                backgroundColor = '#f34a4a';
                 break;
             case VisitScheduleStatus.CANCELLED:
-                backgroundColor = '#A9A9A9';
+                backgroundColor = '#a5a5a5';
                 break;
             default:
-                backgroundColor = '#007bff';
+                backgroundColor = '#057bf9c7';
         }
 
         return {

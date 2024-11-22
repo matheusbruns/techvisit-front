@@ -114,11 +114,13 @@ const TechnicianModal: React.FC<TechnicianModalProps> = ({
                 technician.login === technicianData.login && technician.id !== technicianData.id
         );
 
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
         const newErrors = {
             name: !technicianData.name,
             email:
                 !technicianData.email ||
-                !/\S+@\S+\.\S+/.test(technicianData.email) ||
+                !emailRegex.test(technicianData.email) ||
                 emailExists,
             password:
                 (!technicianDataSelected || isEditingPassword) &&
